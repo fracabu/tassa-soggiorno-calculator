@@ -953,6 +953,20 @@ const MainApp = ({ onLogout, darkMode, toggleDarkMode }) => {
       darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-gray-50 to-blue-50'
     } p-4`}>
       <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-center mb-4">
+            <svg width="120" height="40" viewBox="0 0 300 120" className="mr-3">
+              <text x="60" y="45" fill="#f97316" fontSize="32" fontWeight="bold" fontFamily="Arial, sans-serif">
+                Ospitly
+              </text>
+              <g fill="#f97316">
+                <rect x="10" y="15" width="8" height="25" rx="2"/>
+                <rect x="22" y="10" width="8" height="30" rx="2"/>
+                <rect x="34" y="5" width="8" height="35" rx="2"/>
+                <circle cx="14" cy="8" r="3"/>
+                <path d="M5 45 Q15 35 25 45 Q35 35 45 45" stroke="#f97316" strokeWidth="2" fill="none"/>
+              </g>
+            </svg>
+          </div>
         {/* Header with Dark Mode Toggle */}
         <div className={`${
           darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
