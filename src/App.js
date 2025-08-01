@@ -311,6 +311,17 @@ const LoginScreen = ({ onLogin, darkMode, toggleDarkMode }) => {
           <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} text-sm`}>
             Accesso Riservato • Versione Pro
           </p>
+          <div className={`mt-4 p-3 rounded-lg ${darkMode ? 'bg-gray-700 border border-gray-600' : 'bg-blue-50 border border-blue-200'}`}>
+            <p className={`text-xs ${darkMode ? 'text-gray-300' : 'text-blue-700'} font-medium mb-1`}>
+              Credenziali di accesso:
+            </p>
+            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-blue-600'}`}>
+              Username: <span className="font-mono font-semibold">admin</span>
+            </p>
+            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-blue-600'}`}>
+              Password: <span className="font-mono font-semibold">gecos2024</span>
+            </p>
+          </div>
         </div>
         
         <form onSubmit={handleLogin} className="space-y-6">
