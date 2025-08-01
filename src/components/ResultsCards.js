@@ -1,7 +1,46 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-const ResultsCards = ({ results, darkMode }) => {
-  if (!results) return null;
+const ResultsCards = ({ results, darkMode, prenotazioni, filtroMese }) => {
+  const filteredStats = useMemo(() => {
+    if (!results) return null;
+    
+    // Se non c'è filtro mese, usa i risultati totali
+    if (!filtroMese || !prenotazioni) {
+      return results;
+    }
+    
+    // Filtra le prenotazioni per il mese selezionato
+    const prenotazioniFiltrate = prenotazioni.filter(prenotazione => {
+      if (prenotazione.stato !== "OK") return false;
+      const dataArrivo = new Date(prenotazione.arrivo);
+      const meseArrivo = `${dataArrivo.getFullYear()}-${String(dataArrivo.getMonth() + 1).padStart(2, '0')}`;
+      return meseArrivo === filtroMese;
+    });
+    
+    // Calcola le statistiche per il mese filtrato
+    const totaleIncassi = prenotazioniFiltrate.reduce((sum, p) => sum + p.tassaTotale, 0);
+    const prenotazioniTassabili = prenotazioniFiltrate.length;
+    
+    // Per le prenotazioni cancellate del mese specifico
+    const prenotazioniCancellateFiltrate = prenotazioni.filter(prenotazione => {
+      if (prenotazione.stato === "OK") return false;
+      const dataArrivo = new Date(prenotazione.arrivo);
+      const meseArrivo = `${dataArrivo.getFullYear()}-${String(dataArrivo.getMonth() + 1).padStart(2, '0')}`;
+      return meseArrivo === filtroMese;
+    });
+    
+    const prenotazioneCancellate = prenotazioniCancellateFiltrate.length;
+    const totaleTotale = prenotazioniTassabili + prenotazioneCancellate;
+    
+    return {
+      totaleIncassi,
+      prenotazioniTassabili,
+      prenotazioneCancellate,
+      totaleTotale
+    };
+  }, [results, prenotazioni, filtroMese]);
+
+  if (!filteredStats) return null;
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -10,11 +49,11 @@ const ResultsCards = ({ results, darkMode }) => {
       } rounded-lg border p-4`}>
         <div className="text-center">
           <div className="text-xl font-semibold text-green-600 mb-1">
-            €{results.totaleIncassi.toFixed(2)}
+            €{filteredStats.totaleIncassi.toFixed(2)}
           </div>
           <div className={`text-xs ${
             darkMode ? 'text-gray-400' : 'text-gray-500'
-          }`}>Incassi Totali</div>
+          }`}>Incassi {filtroMese ? 'del Mese' : 'Totali'}</div>
         </div>
       </div>
       
@@ -23,7 +62,7 @@ const ResultsCards = ({ results, darkMode }) => {
       } rounded-lg border p-4`}>
         <div className="text-center">
           <div className="text-xl font-semibold text-blue-600 mb-1">
-            {results.prenotazioniTassabili}
+            {filteredStats.prenotazioniTassabili}
           </div>
           <div className={`text-xs ${
             darkMode ? 'text-gray-400' : 'text-gray-500'
@@ -36,7 +75,7 @@ const ResultsCards = ({ results, darkMode }) => {
       } rounded-lg border p-4`}>
         <div className="text-center">
           <div className="text-xl font-semibold text-red-600 mb-1">
-            {results.prenotazioneCancellate}
+            {filteredStats.prenotazioneCancellate}
           </div>
           <div className={`text-xs ${
             darkMode ? 'text-gray-400' : 'text-gray-500'
@@ -51,7 +90,7 @@ const ResultsCards = ({ results, darkMode }) => {
           <div className={`text-xl font-semibold mb-1 ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
           }`}>
-            {results.totaleTotale}
+            {filteredStats.totaleTotale}
           </div>
           <div className={`text-xs ${
             darkMode ? 'text-gray-400' : 'text-gray-500'

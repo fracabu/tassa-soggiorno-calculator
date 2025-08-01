@@ -109,7 +109,12 @@ const TassaSoggiornoCalculator = () => {
           />
         )}
 
-        <ResultsCards results={results} darkMode={darkMode} />
+        <ResultsCards 
+          results={results} 
+          darkMode={darkMode} 
+          prenotazioni={prenotazioni}
+          filtroMese={filtroMese}
+        />
 
         <BookingsTable 
           darkMode={darkMode}
