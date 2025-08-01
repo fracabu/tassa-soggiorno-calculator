@@ -82,7 +82,7 @@ const TassaSoggiornoCalculator = () => {
   return (
     <div className={`min-h-screen ${
       darkMode ? 'bg-gray-900' : 'bg-gray-50'
-    } p-4`}>
+    } p-2 sm:p-4`}>
       <div className="max-w-6xl mx-auto">
         <Header 
           darkMode={darkMode}

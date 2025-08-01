@@ -4,9 +4,9 @@ const FileUpload = ({ darkMode, error, isProcessing, onFileUpload }) => {
   return (
     <div className={`${
       darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    } rounded-lg border p-6 mb-6`}>
+    } rounded-lg border p-4 sm:p-6 mb-4 sm:mb-6`}>
       {error && (
-        <div className={`mb-6 p-4 rounded-lg border ${
+        <div className={`mb-4 sm:mb-6 p-4 rounded-lg border ${
           darkMode 
             ? 'bg-red-900 border-red-700 text-red-200' 
             : 'bg-red-50 border-red-200 text-red-600'
@@ -20,7 +20,7 @@ const FileUpload = ({ darkMode, error, isProcessing, onFileUpload }) => {
       )}
       
       <div 
-        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer ${
+        className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center cursor-pointer min-h-[200px] sm:min-h-0 flex flex-col justify-center ${
           darkMode 
             ? 'border-gray-600 hover:border-gray-500' 
             : 'border-gray-300 hover:border-gray-400'
@@ -35,16 +35,16 @@ const FileUpload = ({ darkMode, error, isProcessing, onFileUpload }) => {
       >
         {isProcessing ? (
           <div className="space-y-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-200 border-t-blue-600 mx-auto"></div>
-            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            <div className="animate-spin rounded-full h-10 w-10 sm:h-8 sm:w-8 border-2 border-blue-200 border-t-blue-600 mx-auto"></div>
+            <p className={`text-base sm:text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               Elaborazione in corso...
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="text-4xl mb-3">📊</div>
+            <div className="text-5xl sm:text-4xl mb-3">📊</div>
             <div>
-              <h3 className={`text-lg font-medium mb-2 ${
+              <h3 className={`text-xl sm:text-lg font-medium mb-2 ${
                 darkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 Carica file prenotazioni

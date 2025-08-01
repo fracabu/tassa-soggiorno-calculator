@@ -4,37 +4,40 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
   return (
     <div className={`${
       darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    } rounded-lg border p-6 mb-6`}>
-      <div className="flex justify-between items-center">
-        <div className="text-center flex-1">
-          <h1 className={`text-2xl font-semibold mb-2 ${
+    } rounded-lg border p-4 sm:p-6 mb-4 sm:mb-6`}>
+      {/* Mobile-first layout: stack vertically on small screens */}
+      <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
+        <div className="text-center sm:text-left">
+          <h1 className={`text-lg sm:text-xl md:text-2xl font-semibold mb-1 sm:mb-2 ${
             darkMode ? 'text-white' : 'text-gray-900'
           }`}>
             Calcolatore Tassa di Soggiorno
           </h1>
-          <p className={`text-sm ${
+          <p className={`text-xs sm:text-sm ${
             darkMode ? 'text-gray-400' : 'text-gray-600'
           }`}>
             Roma 2025 • Report Gecos • Multi-Tariffa
           </p>
         </div>
         
-        <div className="flex items-center space-x-3">
+        {/* Mobile-first buttons: horizontal on mobile, with better touch targets */}
+        <div className="flex items-center justify-center space-x-2 sm:space-x-3">
           <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onShowGuida();
             }}
-            className={`px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 relative z-10 ${
+            className={`px-3 py-3 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium flex items-center space-x-1 sm:space-x-2 relative z-10 min-h-[44px] sm:min-h-0 ${
               darkMode 
                 ? 'bg-blue-900 hover:bg-blue-800 text-blue-200 border border-blue-700' 
                 : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'
             }`}
             title="Guida GECOS"
           >
-            <span>📖</span>
-            <span>Guida GECOS</span>
+            <span className="text-sm sm:text-base">📖</span>
+            <span className="hidden sm:inline">Guida</span>
+            <span className="sm:hidden">📖</span>
           </button>
           
           <button
@@ -43,7 +46,7 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
               e.stopPropagation();
               toggleDarkMode();
             }}
-            className={`p-2 rounded-lg relative z-10 ${
+            className={`p-3 sm:p-2 rounded-lg relative z-10 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center ${
               darkMode 
                 ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' 
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
@@ -59,7 +62,7 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
               e.stopPropagation();
               onLogout();
             }}
-            className={`px-3 py-2 rounded-lg text-sm font-medium relative z-10 ${
+            className={`px-3 py-3 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium relative z-10 min-h-[44px] sm:min-h-0 ${
               darkMode 
                 ? 'bg-red-900 hover:bg-red-800 text-red-200 border border-red-700' 
                 : 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200'
