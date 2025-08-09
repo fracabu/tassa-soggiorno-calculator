@@ -15,14 +15,14 @@ const ConfigPanel = ({
   return (
     <div className={`${
       darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    } rounded-lg border p-4 sm:p-6 mb-4 sm:mb-6`}>
+    } rounded-lg border p-4 sm:p-5 mb-3 sm:mb-4`}>
       <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
         {/* Selezione Tariffa */}
         <div>
           <label className={`block text-sm font-medium mb-3 ${
             darkMode ? 'text-gray-200' : 'text-gray-700'
           }`}>
-            Tariffa per notte
+            Seleziona l'importo a notte della tua struttura
           </label>
           <div className="flex flex-col sm:flex-row gap-3">
             <select 
@@ -72,7 +72,7 @@ const ConfigPanel = ({
           <p className={`text-xs mt-1 ${
             darkMode ? 'text-gray-500' : 'text-gray-400'
           }`}>
-            Max 10 notti, bambini &lt;10 anni esenti
+            Max 10 notti tassabili, bambini &lt;10 anni esenti
           </p>
         </div>
 

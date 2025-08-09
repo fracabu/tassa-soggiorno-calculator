@@ -3,8 +3,9 @@ import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { comuniItaliani, isAltaStagione, getTariffaPerComune } from '../data/comuniItaliani';
 
-const useBookingProcessor = () => {
+const useBookingProcessor = (comuneSelezionato = 'Roma') => {
   const [prenotazioni, setPrenotazioni] = useState([]);
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
@@ -14,17 +15,43 @@ const useBookingProcessor = () => {
   const [datiMensili, setDatiMensili] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-  const [esenzioniManuali, setEsenzioniManuali] = useState(new Set());
+  const [esenzioniManuali, setEsenzioniManuali] = useState(() => {
+    // Carica esenzioni salvate da localStorage
+    const savedEsenzioni = localStorage.getItem('taxCalculatorEsenzioni');
+    return savedEsenzioni ? new Set(JSON.parse(savedEsenzioni)) : new Set();
+  });
 
-  const MAX_NOTTI_TASSABILI = 10;
-  const ETA_ESENZIONE_BAMBINI = 10;
+  // Regole dinamiche basate sul comune selezionato
+  const getRegolaComune = (nomeComune) => {
+    if (nomeComune === 'custom' || !comuniItaliani[nomeComune]) {
+      return {
+        MAX_NOTTI_TASSABILI: 10,
+        ETA_ESENZIONE_BAMBINI: 10,
+        nome_comune: 'Personalizzato'
+      };
+    }
+    return {
+      MAX_NOTTI_TASSABILI: comuniItaliani[nomeComune].max_notti_tassabili,
+      ETA_ESENZIONE_BAMBINI: comuniItaliani[nomeComune].esenzione_eta,
+      nome_comune: nomeComune,
+      ha_stagionalita: comuniItaliani[nomeComune].ha_stagionalita,
+      periodo_alta_stagione: comuniItaliani[nomeComune].periodo_alta_stagione,
+      tariffa_alta_stagione: comuniItaliani[nomeComune].tariffa_alta_stagione,
+      tariffa_bassa_stagione: comuniItaliani[nomeComune].tariffa_bassa_stagione
+    };
+  };
 
   // Reset della pagina quando cambia il filtro
   useEffect(() => {
     setCurrentPage(1);
   }, [filtroMese, itemsPerPage]);
 
-  // Ricalcola quando cambia la tariffa o le esenzioni
+  // Salva esenzioni in localStorage quando cambiano
+  useEffect(() => {
+    localStorage.setItem('taxCalculatorEsenzioni', JSON.stringify([...esenzioniManuali]));
+  }, [esenzioniManuali]);
+
+  // Ricalcola quando cambia la tariffa, le esenzioni o il comune
   useEffect(() => {
     if (prenotazioni.length > 0) {
       processPrenotazioni(prenotazioni.map(p => ({
@@ -36,9 +63,9 @@ const useBookingProcessor = () => {
         partenza: p.partenza,
         stato: p.stato,
         paese: p.paese
-      })));
+      })), comuneSelezionato);
     }
-  }, [tariffePersonalizzate, esenzioniManuali]);
+  }, [tariffePersonalizzate, esenzioniManuali, comuneSelezionato]);
 
   const handleFileUpload = async (file) => {
     if (!file) return;
@@ -122,7 +149,66 @@ const useBookingProcessor = () => {
     });
   };
 
+  const detectCsvFormat = (data) => {
+    if (data.length === 0) return 'unknown';
+    
+    const firstRow = data[0];
+    const headers = Object.keys(firstRow).map(h => h.toLowerCase());
+    
+    // Controlla se è Airbnb
+    if (headers.includes('codice di conferma') || headers.includes('nome dell\'ospite') || headers.includes('n. di adulti')) {
+      return 'airbnb';
+    }
+    
+    // Controlla se è Booking.com
+    if (headers.includes('booker country') || headers.includes('prenotato da') || headers.includes('nome ospite(i)')) {
+      return 'booking';
+    }
+    
+    return 'generic';
+  };
+
   const mapCsvData = (data) => {
+    const format = detectCsvFormat(data);
+    
+    if (format === 'airbnb') {
+      return mapAirbnbData(data);
+    } else {
+      return mapBookingCsvData(data);
+    }
+  };
+
+  const mapAirbnbData = (data) => {
+    return data.map((row, index) => {
+      const adulti = parseInt(row['N. di adulti'] || row['N di adulti'] || 1);
+      const bambini = parseInt(row['N. di bambini'] || row['N di bambini'] || 0);
+      const neonati = parseInt(row['N. di neonati'] || row['N di neonati'] || 0);
+      
+      // In Airbnb, assumiamo che i neonati (0-2 anni) siano sempre esenti
+      // e i bambini (3-12 anni) possano essere esenti se < 10 anni
+      const ospiti = adulti + bambini + neonati;
+      
+      // Mappiamo lo stato Airbnb
+      let stato = 'OK';
+      const statoAirbnb = (row['Stato'] || row['Status'] || '').toLowerCase();
+      if (statoAirbnb.includes('cancellat') || statoAirbnb.includes('cancel')) {
+        stato = 'Cancellata';
+      }
+      
+      return {
+        nome: row['Nome dell\'ospite'] || row['Guest Name'] || `Ospite ${index + 1}`,
+        ospiti: ospiti,
+        bambini: bambini + neonati, // Contiamo tutti i minori
+        etaBambini: [], // Airbnb non fornisce età specifiche, assumiamo tutti esenti
+        arrivo: formatAirbnbDate(row['Data di inizio'] || row['Check-in'] || ''),
+        partenza: formatAirbnbDate(row['Data di fine'] || row['Check-out'] || ''),
+        stato: stato,
+        paese: 'IT' // Airbnb non fornisce sempre il paese, assumiamo Italia
+      };
+    });
+  };
+
+  const mapBookingCsvData = (data) => {
     return data.map((row, index) => ({
       nome: row.Nome || row['Nome ospite'] || row['Guest Name'] || `Ospite ${index + 1}`,
       ospiti: parseInt(row.Ospiti || row['Numero Ospiti'] || row['Total Guests'] || row.Persone || 1),
@@ -134,6 +220,19 @@ const useBookingProcessor = () => {
       stato: mapStatus(row.Stato || row.Status || 'OK'),
       paese: row['Booker country'] || row.Paese || row.Country || 'unknown'
     }));
+  };
+
+  const formatAirbnbDate = (dateStr) => {
+    if (!dateStr) return new Date().toISOString().split('T')[0];
+    
+    // Airbnb usa formato DD/MM/YYYY
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+    
+    return dateStr;
   };
 
   const formatDate = (dateValue) => {
@@ -171,24 +270,33 @@ const useBookingProcessor = () => {
     return 'OK';
   };
 
-  const processPrenotazioni = (data) => {
+  const processPrenotazioni = (data, comuneCorrente = comuneSelezionato) => {
+    const regole = getRegolaComune(comuneCorrente);
+    
     const risultati = data.map(prenotazione => {
       const notti = calcolaNotti(prenotazione.arrivo, prenotazione.partenza);
-      const nottiTassabili = Math.min(notti, MAX_NOTTI_TASSABILI);
+      const nottiTassabili = Math.min(notti, regole.MAX_NOTTI_TASSABILI);
       
       let adultiTassabili = prenotazione.ospiti;
       let bambiniEsenti = 0;
       let bambiniTassabili = 0;
       
       if (prenotazione.bambini > 0 && prenotazione.etaBambini && prenotazione.etaBambini.length > 0) {
-        bambiniEsenti = prenotazione.etaBambini.filter(eta => eta < ETA_ESENZIONE_BAMBINI).length;
-        bambiniTassabili = prenotazione.etaBambini.filter(eta => eta >= ETA_ESENZIONE_BAMBINI).length;
+        bambiniEsenti = prenotazione.etaBambini.filter(eta => eta < regole.ETA_ESENZIONE_BAMBINI).length;
+        bambiniTassabili = prenotazione.etaBambini.filter(eta => eta >= regole.ETA_ESENZIONE_BAMBINI).length;
         adultiTassabili = prenotazione.ospiti - prenotazione.bambini + bambiniTassabili;
       }
       
       let tassaTotale = 0;
       if (prenotazione.stato === "OK" && !esenzioniManuali.has(prenotazione.nome)) {
-        tassaTotale = adultiTassabili * nottiTassabili * tariffePersonalizzate;
+        // Calcola tariffa considerando stagionalità se applicabile
+        let tariffa = tariffePersonalizzate;
+        if (regole.ha_stagionalita && comuneCorrente !== 'custom') {
+          const altaStagione = isAltaStagione(comuneCorrente, prenotazione.arrivo);
+          tariffa = altaStagione ? regole.tariffa_alta_stagione : regole.tariffa_bassa_stagione;
+        }
+        
+        tassaTotale = adultiTassabili * nottiTassabili * tariffa;
       }
       
       return {
@@ -284,21 +392,103 @@ const useBookingProcessor = () => {
   const exportResultsCSV = () => {
     if (!prenotazioni || prenotazioni.length === 0) return;
     
-    const csvData = prenotazioni.map(p => ({
-      'Nome': p.nome,
-      'Paese': getCountryName(p.paese),
-      'Ospiti': p.ospiti,
-      'Bambini': p.bambini || 0,
-      'Bambini Esenti': p.bambiniEsenti || 0,
-      'Adulti Tassabili': p.adultiTassabili,
-      'Arrivo': p.arrivo,
-      'Partenza': p.partenza,
-      'Notti': p.notti,
-      'Notti Tassabili': p.nottiTassabili,
-      'Stato': p.stato,
-      'Esente Manuale': esenzioniManuali.has(p.nome) ? 'Sì' : 'No',
-      'Tassa Totale': p.tassaTotale.toFixed(2)
-    }));
+    const { trimestri, totaliGenerali } = raggruppaNeiTrimestri(prenotazioni);
+    const csvData = [];
+    
+    // Aggiungi prenotazioni raggruppate per trimestre
+    Object.keys(trimestri).sort().forEach(trimestre => {
+      // Header trimestre
+      csvData.push({
+        'Nome': `=== ${trimestre} ===`,
+        'Paese': '',
+        'Ospiti': '',
+        'Bambini': '',
+        'Bambini Esenti': '',
+        'Adulti Tassabili': '',
+        'Arrivo': '',
+        'Partenza': '',
+        'Notti': '',
+        'Notti Tassabili': '',
+        'Stato': '',
+        'Trimestre': trimestre,
+        'Esente Manuale': '',
+        'Tassa Totale': ''
+      });
+      
+      // Prenotazioni del trimestre
+      trimestri[trimestre].prenotazioni.forEach(p => {
+        csvData.push({
+          'Nome': p.nome,
+          'Paese': getCountryName(p.paese),
+          'Ospiti': p.ospiti,
+          'Bambini': p.bambini || 0,
+          'Bambini Esenti': p.bambiniEsenti || 0,
+          'Adulti Tassabili': p.adultiTassabili,
+          'Arrivo': p.arrivo,
+          'Partenza': p.partenza,
+          'Notti': p.notti,
+          'Notti Tassabili': p.nottiTassabili,
+          'Stato': p.stato,
+          'Trimestre': getTrimestre(p.arrivo),
+          'Esente Manuale': esenzioniManuali.has(p.nome) ? 'Sì' : 'No',
+          'Tassa Totale': p.tassaTotale.toFixed(2)
+        });
+      });
+      
+      // Totale trimestre
+      csvData.push({
+        'Nome': `TOTALE ${trimestre}`,
+        'Paese': '',
+        'Ospiti': trimestri[trimestre].totali.ospiti,
+        'Bambini': trimestri[trimestre].totali.bambini,
+        'Bambini Esenti': trimestri[trimestre].totali.bambiniEsenti,
+        'Adulti Tassabili': trimestri[trimestre].totali.adultiTassabili,
+        'Arrivo': '',
+        'Partenza': '',
+        'Notti': trimestri[trimestre].totali.notti,
+        'Notti Tassabili': trimestri[trimestre].totali.nottiTassabili,
+        'Stato': '',
+        'Trimestre': '',
+        'Esente Manuale': '',
+        'Tassa Totale': trimestri[trimestre].totali.tassa.toFixed(2)
+      });
+      
+      // Riga vuota
+      csvData.push({
+        'Nome': '',
+        'Paese': '',
+        'Ospiti': '',
+        'Bambini': '',
+        'Bambini Esenti': '',
+        'Adulti Tassabili': '',
+        'Arrivo': '',
+        'Partenza': '',
+        'Notti': '',
+        'Notti Tassabili': '',
+        'Stato': '',
+        'Trimestre': '',
+        'Esente Manuale': '',
+        'Tassa Totale': ''
+      });
+    });
+    
+    // Totale generale
+    csvData.push({
+      'Nome': '=== TOTALE GENERALE ===',
+      'Paese': '',
+      'Ospiti': totaliGenerali.ospiti,
+      'Bambini': totaliGenerali.bambini,
+      'Bambini Esenti': totaliGenerali.bambiniEsenti,
+      'Adulti Tassabili': totaliGenerali.adultiTassabili,
+      'Arrivo': '',
+      'Partenza': '',
+      'Notti': totaliGenerali.notti,
+      'Notti Tassabili': totaliGenerali.nottiTassabili,
+      'Stato': '',
+      'Trimestre': '',
+      'Esente Manuale': '',
+      'Tassa Totale': totaliGenerali.tassa.toFixed(2)
+    });
     
     try {
       // Configurazione Papa Parse per CSV ben formattato
@@ -333,52 +523,111 @@ const useBookingProcessor = () => {
     
     try {
       const doc = new jsPDF();
+      const { trimestri, totaliGenerali } = raggruppaNeiTrimestri(prenotazioni);
+      let currentY = 15;
       
       // Header
       doc.setFontSize(16);
-      doc.text('Dettaglio Tassa di Soggiorno Roma 2025', 14, 15);
+      doc.text('Tassa di Soggiorno Roma 2025 - Report Trimestrale', 14, currentY);
+      currentY += 10;
       
       doc.setFontSize(10);
-      doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 14, 25);
+      doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 14, currentY);
+      currentY += 5;
       
-      // Riepilogo
+      // Riepilogo generale
       if (results) {
-        doc.text(`Prenotazioni tassabili: ${results.prenotazioniTassabili}`, 14, 35);
-        doc.text(`Totale incassi: €${results.totaleIncassi.toFixed(2)}`, 14, 40);
-        doc.text(`Tariffa per persona/notte: €${tariffePersonalizzate.toFixed(2)}`, 14, 45);
+        doc.text(`Prenotazioni tassabili totali: ${results.prenotazioniTassabili}`, 14, currentY);
+        currentY += 5;
+        doc.text(`Totale generale: €${totaliGenerali.tassa.toFixed(2)}`, 14, currentY);
+        currentY += 5;
+        doc.text(`Tariffa per persona/notte: €${tariffePersonalizzate.toFixed(2)}`, 14, currentY);
+        currentY += 15;
       }
       
-      // Tabella
-      const tableData = prenotazioni.map(p => [
-        p.nome,
-        getCountryName(p.paese),
-        p.ospiti.toString(),
-        p.adultiTassabili.toString(),
-        p.arrivo,
-        p.partenza,
-        p.notti.toString(),
-        p.nottiTassabili.toString(),
-        p.stato,
-        esenzioniManuali.has(p.nome) ? 'Sì' : 'No',
-        `€${p.tassaTotale.toFixed(2)}`
-      ]);
-      
-      autoTable(doc, {
-        head: [[
-          'Nome', 'Paese', 'Ospiti', 'Tassabili', 
-          'Arrivo', 'Partenza', 'Notti', 'N.Tass', 
-          'Stato', 'Esente', 'Tassa'
-        ]],
-        body: tableData,
-        startY: 55,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [41, 128, 185] },
-        columnStyles: {
-          10: { halign: 'right' } // Align tassa column to right
+      // Tabelle per trimestre
+      Object.keys(trimestri).sort().forEach((trimestre, index) => {
+        if (index > 0 && currentY > 200) {
+          doc.addPage();
+          currentY = 15;
         }
+        
+        // Header trimestre
+        doc.setFontSize(12);
+        const trimestreText = `${trimestre} - Totale: €${trimestri[trimestre].totali.tassa.toFixed(2)}`;
+        doc.text(trimestreText, 14, currentY);
+        currentY += 10;
+        
+        // Dati trimestre
+        const tableData = trimestri[trimestre].prenotazioni.map(p => [
+          p.nome,
+          getCountryName(p.paese),
+          p.ospiti.toString(),
+          p.adultiTassabili.toString(),
+          p.arrivo,
+          p.partenza,
+          p.notti.toString(),
+          p.nottiTassabili.toString(),
+          p.stato,
+          esenzioniManuali.has(p.nome) ? 'Sì' : 'No',
+          `€${p.tassaTotale.toFixed(2)}`
+        ]);
+        
+        // Aggiungi riga totale
+        tableData.push([
+          'TOTALE TRIMESTRE', 
+          '', 
+          trimestri[trimestre].totali.ospiti.toString(),
+          trimestri[trimestre].totali.adultiTassabili.toString(),
+          '', 
+          '', 
+          trimestri[trimestre].totali.notti.toString(),
+          trimestri[trimestre].totali.nottiTassabili.toString(),
+          '', 
+          '',
+          `€${trimestri[trimestre].totali.tassa.toFixed(2)}`
+        ]);
+        
+        autoTable(doc, {
+          head: [[
+            'Nome', 'Paese', 'Ospiti', 'Tassabili', 
+            'Arrivo', 'Partenza', 'Notti', 'N.Tass', 
+            'Stato', 'Esente', 'Tassa'
+          ]],
+          body: tableData,
+          startY: currentY,
+          styles: { fontSize: 7 },
+          headStyles: { fillColor: [41, 128, 185] },
+          columnStyles: {
+            10: { halign: 'right' }
+          },
+          // Stile speciale per riga totale
+          didParseCell: function(data) {
+            if (data.row.index === tableData.length - 1) {
+              data.cell.styles.fontStyle = 'bold';
+              data.cell.styles.fillColor = [240, 240, 240];
+            }
+          }
+        });
+        
+        currentY = doc.lastAutoTable.finalY + 15;
       });
       
-      doc.save(`tassa_soggiorno_${new Date().toISOString().split('T')[0]}.pdf`);
+      // Totale generale finale
+      if (currentY > 250) {
+        doc.addPage();
+        currentY = 15;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text(`TOTALE GENERALE: €${totaliGenerali.tassa.toFixed(2)}`, 14, currentY);
+      currentY += 10;
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Ospiti totali: ${totaliGenerali.ospiti} | Notti totali: ${totaliGenerali.notti} | Notti tassabili: ${totaliGenerali.nottiTassabili}`, 14, currentY);
+      
+      doc.save(`tassa_soggiorno_trimestri_${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error) {
       console.error('Errore nell\'export PDF:', error);
       alert('Errore durante l\'export del PDF. Riprova.');
@@ -393,6 +642,74 @@ const useBookingProcessor = () => {
       newEsenzioni.add(nomeOspite);
     }
     setEsenzioniManuali(newEsenzioni);
+  };
+
+  const clearEsenzioni = () => {
+    setEsenzioniManuali(new Set());
+    localStorage.removeItem('taxCalculatorEsenzioni');
+  };
+
+  const getTrimestre = (dataArrivo) => {
+    const data = new Date(dataArrivo);
+    const mese = data.getMonth() + 1; // getMonth() returns 0-11
+    
+    if (mese >= 1 && mese <= 3) return 'Q1 (Gen-Mar) - Scadenza 16 Apr';
+    if (mese >= 4 && mese <= 6) return 'Q2 (Apr-Giu) - Scadenza 16 Lug';
+    if (mese >= 7 && mese <= 9) return 'Q3 (Lug-Set) - Scadenza 16 Ott';
+    return 'Q4 (Ott-Dic) - Scadenza 16 Gen';
+  };
+
+  const raggruppaNeiTrimestri = (prenotazioni) => {
+    const trimestri = {};
+    let totaliGenerali = {
+      ospiti: 0,
+      bambini: 0,
+      bambiniEsenti: 0,
+      adultiTassabili: 0,
+      notti: 0,
+      nottiTassabili: 0,
+      tassa: 0
+    };
+    
+    prenotazioni.forEach(p => {
+      if (p.stato === 'OK') {
+        const trimestre = getTrimestre(p.arrivo);
+        if (!trimestri[trimestre]) {
+          trimestri[trimestre] = { 
+            prenotazioni: [], 
+            totali: {
+              ospiti: 0,
+              bambini: 0,
+              bambiniEsenti: 0,
+              adultiTassabili: 0,
+              notti: 0,
+              nottiTassabili: 0,
+              tassa: 0
+            }
+          };
+        }
+        
+        trimestri[trimestre].prenotazioni.push(p);
+        trimestri[trimestre].totali.ospiti += p.ospiti;
+        trimestri[trimestre].totali.bambini += p.bambini || 0;
+        trimestri[trimestre].totali.bambiniEsenti += p.bambiniEsenti || 0;
+        trimestri[trimestre].totali.adultiTassabili += p.adultiTassabili;
+        trimestri[trimestre].totali.notti += p.notti;
+        trimestri[trimestre].totali.nottiTassabili += p.nottiTassabili;
+        trimestri[trimestre].totali.tassa += p.tassaTotale;
+        
+        // Totali generali
+        totaliGenerali.ospiti += p.ospiti;
+        totaliGenerali.bambini += p.bambini || 0;
+        totaliGenerali.bambiniEsenti += p.bambiniEsenti || 0;
+        totaliGenerali.adultiTassabili += p.adultiTassabili;
+        totaliGenerali.notti += p.notti;
+        totaliGenerali.nottiTassabili += p.nottiTassabili;
+        totaliGenerali.tassa += p.tassaTotale;
+      }
+    });
+    
+    return { trimestri, totaliGenerali };
   };
 
   return {
@@ -411,6 +728,7 @@ const useBookingProcessor = () => {
     setItemsPerPage,
     esenzioniManuali,
     toggleEsenzione,
+    clearEsenzioni,
     handleFileUpload,
     exportResultsCSV,
     exportResultsPDF,

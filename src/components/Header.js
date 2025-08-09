@@ -4,19 +4,19 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
   return (
     <div className={`${
       darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    } rounded-lg border p-4 sm:p-6 mb-4 sm:mb-6`}>
+    } rounded-lg border p-3 mb-2`}>
       {/* Mobile-first layout: stack vertically on small screens */}
       <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
         <div className="text-center sm:text-left">
-          <h1 className={`text-lg sm:text-xl md:text-2xl font-semibold mb-1 sm:mb-2 ${
+          <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-semibold mb-1 sm:mb-2 ${
             darkMode ? 'text-white' : 'text-gray-900'
           }`}>
             Calcolatore Tassa di Soggiorno
           </h1>
-          <p className={`text-xs sm:text-sm ${
+          <p className={`text-sm sm:text-base lg:text-lg ${
             darkMode ? 'text-gray-400' : 'text-gray-600'
           }`}>
-            Roma 2025 • Report Gecos • Multi-Tariffa
+            Italia 2025 • Multi-Comune • Report CSV/PDF
           </p>
         </div>
         

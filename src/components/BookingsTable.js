@@ -11,6 +11,7 @@ const BookingsTable = ({
   tariffePersonalizzate,
   esenzioniManuali,
   toggleEsenzione,
+  clearEsenzioni,
   onExportCSV,
   onExportPDF,
   getCountryName
@@ -180,6 +181,15 @@ const BookingsTable = ({
             <option value={100}>100 per pagina</option>
           </select>
           <div className="flex gap-2">
+            {esenzioniManuali.size > 0 && (
+              <button
+                onClick={clearEsenzioni}
+                className="px-4 py-3 sm:py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium text-base sm:text-sm min-h-[44px] sm:min-h-0"
+                title="Pulisci tutte le esenzioni salvate"
+              >
+                Pulisci Esenzioni ({esenzioniManuali.size})
+              </button>
+            )}
             <button
               onClick={onExportCSV}
               className="px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base sm:text-sm min-h-[44px] sm:min-h-0"
@@ -206,44 +216,44 @@ const BookingsTable = ({
       {/* Desktop View - Table */}
       <div className="hidden lg:block">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <table className="w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
             <thead className={`${
               darkMode ? 'bg-gray-700' : 'bg-gray-50'
             }`}>
               <tr>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-2 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   darkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>
+                }`} style={{width: '25%'}}>
                   Ospite
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-2 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   darkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>
+                }`} style={{width: '20%'}}>
                   Periodo
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-2 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   darkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>
+                }`} style={{width: '15%'}}>
                   Persone
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-2 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   darkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>
-                  Notti Tassabili
+                }`} style={{width: '10%'}}>
+                  Notti
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-2 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   darkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>
+                }`} style={{width: '10%'}}>
                   Stato
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-2 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   darkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>
+                }`} style={{width: '10%'}}>
                   Esente
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-2 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   darkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>
+                }`} style={{width: '10%'}}>
                   Tassa
                 </th>
               </tr>
@@ -255,22 +265,22 @@ const BookingsTable = ({
                 <tr key={index} className={`transition-colors duration-150 ${
                   darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                 }`}>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-2 py-4">
                     <div>
-                      <div className={`text-sm font-medium ${
+                      <div className={`text-sm font-medium break-words ${
                         darkMode ? 'text-white' : 'text-gray-900'
-                      }`}>
+                      }`} title={prenotazione.nome}>
                         {prenotazione.nome}
                       </div>
-                      <div className={`text-sm ${
+                      <div className={`text-xs ${
                         darkMode ? 'text-gray-400' : 'text-gray-500'
                       }`}>
                         {getCountryName(prenotazione.paese)}
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm ${
+                  <td className="px-2 py-4">
+                    <div className={`text-sm break-words ${
                       darkMode ? 'text-gray-300' : 'text-gray-900'
                     }`}>
                       {new Date(prenotazione.arrivo).toLocaleDateString('it-IT')} - {new Date(prenotazione.partenza).toLocaleDateString('it-IT')}
@@ -281,11 +291,11 @@ const BookingsTable = ({
                       {prenotazione.notti} {prenotazione.notti === 1 ? 'notte' : 'notti'}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-2 py-4">
                     <div className={`text-sm ${
                       darkMode ? 'text-gray-300' : 'text-gray-900'
                     }`}>
-                      {prenotazione.adultiTassabili} adulti tassabili
+                      {prenotazione.adultiTassabili} adulti
                     </div>
                     {prenotazione.bambiniEsenti > 0 && (
                       <div className="text-xs text-green-500">
@@ -299,26 +309,26 @@ const BookingsTable = ({
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-2 py-4">
                     <div className={`text-sm ${
                       darkMode ? 'text-gray-300' : 'text-gray-900'
                     }`}>
                       {prenotazione.nottiTassabili}
                       {prenotazione.notti > 10 && (
-                        <span className="text-xs text-orange-500 ml-1">(max 10)</span>
+                        <span className="text-xs text-orange-500 ml-1">(max)</span>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-2 py-4">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       prenotazione.stato === 'OK' 
                         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
                         : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                     }`}>
-                      {prenotazione.stato}
+                      {prenotazione.stato === 'OK' ? 'OK' : 'KO'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-2 py-4">
                     <label className="flex items-center cursor-pointer">
                       <input
                         type="checkbox"
@@ -328,21 +338,21 @@ const BookingsTable = ({
                           darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white'
                         }`}
                       />
-                      <span className={`ml-2 text-xs ${
+                      <span className={`ml-1 text-xs ${
                         darkMode ? 'text-gray-300' : 'text-gray-600'
                       }`}>
                         {esenzioniManuali.has(prenotazione.nome) ? 'Sì' : 'No'}
                       </span>
                     </label>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-2 py-4">
                     <div className={`text-sm font-medium ${
                       darkMode ? 'text-white' : 'text-gray-900'
                     }`}>
                       €{prenotazione.tassaTotale.toFixed(2)}
                     </div>
                     {prenotazione.tassaTotale > 0 && (
-                      <div className={`text-xs ${
+                      <div className={`text-xs break-all ${
                         darkMode ? 'text-gray-400' : 'text-gray-500'
                       }`}>
                         {prenotazione.adultiTassabili} × {prenotazione.nottiTassabili} × €{tariffePersonalizzate.toFixed(2)}

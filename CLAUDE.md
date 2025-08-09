@@ -67,6 +67,8 @@ The heart of the application is the `useBookingProcessor` custom hook which hand
 - **XLSX**: Excel file processing (`^0.18.5`)
 - **Papa Parse**: CSV file processing (`^5.4.1`)
 - **D3**: Data visualization for country statistics (`^7.8.5`)
+- **jsPDF**: PDF generation (`^3.0.1`)
+- **jsPDF-AutoTable**: PDF table generation (`^5.0.2`)
 - **Lodash**: Utility functions (`^4.17.21`)
 - **Math.js**: Mathematical calculations (`^11.11.0`)
 - **Lucide React**: Icon library (`^0.263.1`)
@@ -154,7 +156,7 @@ src/
 - Standard Create React App structure maintained
 
 ## Important Constants
-- **MAX_NOTTI_TASSABILI**: 10 nights maximum per booking (in useBookingProcessor.js:16)
-- **ETA_ESENZIONE_BAMBINI**: Children under 10 exempted (in useBookingProcessor.js:17)
+- **MAX_NOTTI_TASSABILI**: 10 nights maximum per booking (in useBookingProcessor.js:23)
+- **ETA_ESENZIONE_BAMBINI**: Children under 10 exempted (in useBookingProcessor.js:24)
 - **Default tax rate**: €6.00 per night per adult guest
 - **Authentication credentials**: admin/gecos2024 (hardcoded in LoginScreen component)
