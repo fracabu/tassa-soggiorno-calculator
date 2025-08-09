@@ -64,7 +64,7 @@ const BookingsTable = ({
           </p>
         </div>
         <div className="text-right">
-          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+          <span className={`inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
             prenotazione.stato === 'OK' 
               ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
               : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
@@ -87,7 +87,7 @@ const BookingsTable = ({
           <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             {new Date(prenotazione.partenza).toLocaleDateString('it-IT')}
           </p>
-          <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+          <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
             {prenotazione.notti} {prenotazione.notti === 1 ? 'notte' : 'notti'}
           </p>
         </div>
@@ -102,7 +102,7 @@ const BookingsTable = ({
             {prenotazione.adultiTassabili} adulti tassabili
           </p>
           {prenotazione.bambiniEsenti > 0 && (
-            <p className="text-xs text-green-500">
+            <p className="text-sm text-green-500">
               -{prenotazione.bambiniEsenti} bambini esenti
             </p>
           )}
@@ -124,7 +124,7 @@ const BookingsTable = ({
             €{prenotazione.tassaTotale.toFixed(2)}
           </div>
           {prenotazione.tassaTotale > 0 && (
-            <div className={`text-xs ${
+            <div className={`text-sm ${
               darkMode ? 'text-gray-400' : 'text-gray-500'
             }`}>
               {prenotazione.adultiTassabili} × {prenotazione.nottiTassabili} × €{tariffePersonalizzate.toFixed(2)}
@@ -272,7 +272,7 @@ const BookingsTable = ({
                       }`} title={prenotazione.nome}>
                         {prenotazione.nome}
                       </div>
-                      <div className={`text-xs ${
+                      <div className={`text-sm ${
                         darkMode ? 'text-gray-400' : 'text-gray-500'
                       }`}>
                         {getCountryName(prenotazione.paese)}
@@ -298,13 +298,13 @@ const BookingsTable = ({
                       {prenotazione.adultiTassabili} adulti
                     </div>
                     {prenotazione.bambiniEsenti > 0 && (
-                      <div className="text-xs text-green-500">
+                      <div className="text-sm text-green-500">
                         -{prenotazione.bambiniEsenti} {prenotazione.bambiniEsenti === 1 ? 
                           'bambino esente' : 'bambini esenti'} (&lt;10 anni)
                       </div>
                     )}
                     {prenotazione.bambini > prenotazione.bambiniEsenti && (
-                      <div className="text-xs text-orange-500">
+                      <div className="text-sm text-orange-500">
                         +{prenotazione.bambini - prenotazione.bambiniEsenti} {(prenotazione.bambini - prenotazione.bambiniEsenti) === 1 ? 'bambino tassabile' : 'bambini tassabili'} (≥10 anni)
                       </div>
                     )}
@@ -315,12 +315,12 @@ const BookingsTable = ({
                     }`}>
                       {prenotazione.nottiTassabili}
                       {prenotazione.notti > 10 && (
-                        <span className="text-xs text-orange-500 ml-1">(max)</span>
+                        <span className="text-sm text-orange-500 ml-1">(max)</span>
                       )}
                     </div>
                   </td>
                   <td className="px-2 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    <span className={`inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
                       prenotazione.stato === 'OK' 
                         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
                         : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
@@ -338,7 +338,7 @@ const BookingsTable = ({
                           darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white'
                         }`}
                       />
-                      <span className={`ml-1 text-xs ${
+                      <span className={`ml-1 text-sm ${
                         darkMode ? 'text-gray-300' : 'text-gray-600'
                       }`}>
                         {esenzioniManuali.has(prenotazione.nome) ? 'Sì' : 'No'}
@@ -352,7 +352,7 @@ const BookingsTable = ({
                       €{prenotazione.tassaTotale.toFixed(2)}
                     </div>
                     {prenotazione.tassaTotale > 0 && (
-                      <div className={`text-xs break-all ${
+                      <div className={`text-sm break-all ${
                         darkMode ? 'text-gray-400' : 'text-gray-500'
                       }`}>
                         {prenotazione.adultiTassabili} × {prenotazione.nottiTassabili} × €{tariffePersonalizzate.toFixed(2)}

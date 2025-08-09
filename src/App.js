@@ -91,17 +91,18 @@ const TassaSoggiornoCalculator = () => {
     <div className={`min-h-screen ${
       darkMode ? 'bg-gray-900' : 'bg-gray-50'
     } p-2 flex justify-center`}>
-      <div className="max-w-6xl w-full flex flex-col">
-        <Header 
-          darkMode={darkMode}
-          toggleDarkMode={toggleDarkMode}
-          onLogout={handleLogout}
-          onShowGuida={() => setShowGuida(true)}
-        />
+        <div className="max-w-6xl w-full flex flex-col">
+          <Header 
+            darkMode={darkMode}
+            toggleDarkMode={toggleDarkMode}
+            onLogout={handleLogout}
+            onShowGuida={() => setShowGuida(true)}
+          />
 
-        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-4 justify-items-center mb-6 ${
-          !prenotazioni.length ? 'flex-1 min-h-[70vh] items-center' : 'items-start'
-        }`}>
+        <div className="mb-6">
+          <div className={`grid grid-cols-1 lg:grid-cols-3 gap-4 justify-items-center ${
+            !prenotazioni.length ? 'flex-1 min-h-[70vh] items-center' : 'items-start'
+          }`}>
           {/* Step 1: Configurazione */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -117,7 +118,7 @@ const TassaSoggiornoCalculator = () => {
               }`}>
                 Seleziona Comune
               </h3>
-              <p className={`text-sm mt-2 ${
+              <p className={`text-base mt-2 ${
                 darkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>
                 Regole automatiche per comune
@@ -177,10 +178,10 @@ const TassaSoggiornoCalculator = () => {
                   <div className={`text-lg font-bold ${
                     darkMode ? 'text-white' : 'text-gray-900'
                   }`}>€{tariffePersonalizzate.toFixed(2)}</div>
-                  <div className={`text-xs ${
+                  <div className={`text-sm ${
                     darkMode ? 'text-gray-400' : 'text-gray-600'
                   }`}>per persona/notte</div>
-                  <div className={`text-xs mt-1 ${
+                  <div className={`text-sm mt-1 ${
                     darkMode ? 'text-gray-500' : 'text-gray-500'
                   }`}>
                     Max {comuniItaliani[comuneSelezionato].max_notti_tassabili} notti • 
@@ -197,10 +198,10 @@ const TassaSoggiornoCalculator = () => {
                   <div className={`text-lg font-bold ${
                     darkMode ? 'text-white' : 'text-gray-900'
                   }`}>€{tariffePersonalizzate.toFixed(2)}</div>
-                  <div className={`text-xs ${
+                  <div className={`text-sm ${
                     darkMode ? 'text-gray-400' : 'text-gray-600'
                   }`}>per persona/notte</div>
-                  <div className={`text-xs mt-1 ${
+                  <div className={`text-sm mt-1 ${
                     darkMode ? 'text-gray-500' : 'text-gray-500'
                   }`}>
                     Configurazione personalizzata
@@ -227,7 +228,7 @@ const TassaSoggiornoCalculator = () => {
               }`}>
                 Carica File
               </h3>
-              <p className={`text-sm mt-2 ${
+              <p className={`text-base mt-2 ${
                 darkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>
                 Excel/CSV da Booking o Airbnb
@@ -247,8 +248,8 @@ const TassaSoggiornoCalculator = () => {
                   darkMode ? 'text-green-300' : 'text-green-600'
                 }`}>
                   <div className="text-4xl mb-2">✅</div>
-                  <p className="text-sm font-medium">File caricato</p>
-                  <p className="text-xs">{prenotazioni.length} prenotazioni</p>
+                  <p className="text-base font-medium">File caricato</p>
+                  <p className="text-sm">{prenotazioni.length} prenotazioni</p>
                   <button
                     onClick={() => {
                       setPrenotazioni([]);
@@ -257,7 +258,7 @@ const TassaSoggiornoCalculator = () => {
                       setFiltroMese('');
                       setDatiMensili(null);
                     }}
-                    className={`mt-2 text-xs px-3 py-1 rounded ${
+                    className={`mt-2 text-sm px-3 py-1 rounded ${
                       darkMode 
                         ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
@@ -289,7 +290,7 @@ const TassaSoggiornoCalculator = () => {
               }`}>
                 Scarica Report
               </h3>
-              <p className={`text-sm mt-2 ${
+              <p className={`text-base mt-2 ${
                 results 
                   ? (darkMode ? 'text-gray-300' : 'text-gray-600')
                   : (darkMode ? 'text-gray-500' : 'text-gray-400')
@@ -304,7 +305,7 @@ const TassaSoggiornoCalculator = () => {
                   darkMode ? 'text-gray-500' : 'text-gray-400'
                 }`}>
                   <div className="text-4xl mb-2">📊</div>
-                  <p className="text-xs">In attesa dei dati...</p>
+                  <p className="text-sm">In attesa dei dati...</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -316,7 +317,7 @@ const TassaSoggiornoCalculator = () => {
                     }`}>
                       €{results.totaleIncassi.toFixed(2)}
                     </div>
-                    <div className={`text-xs ${
+                    <div className={`text-sm ${
                       darkMode ? 'text-gray-400' : 'text-gray-600'
                     }`}>
                       Incassi Totali
@@ -349,6 +350,7 @@ const TassaSoggiornoCalculator = () => {
               )}
             </div>
           </div>
+          </div>
         </div>
 
         {/* Filtro mesi se ci sono dati */}
@@ -357,7 +359,7 @@ const TassaSoggiornoCalculator = () => {
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
           } rounded-lg border p-4 sm:p-5 mb-3 sm:mb-4`}>
             <div className="flex items-center gap-4">
-              <label className={`text-sm font-medium ${
+              <label className={`text-base font-medium ${
                 darkMode ? 'text-gray-200' : 'text-gray-700'
               }`}>
                 Filtra per mese:

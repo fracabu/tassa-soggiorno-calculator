@@ -4,17 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a React-based web application called "Calcolatore Tassa di Soggiorno Roma 2025" (Tourist Tax Calculator for Rome 2025). It's a specialized tool for calculating tourist taxes for accommodation facilities in Rome according to 2025 municipal regulations.
+This is a React-based web application called "Calcolatore Tassa di Soggiorno - Comuni Italiani 2025" (Tourist Tax Calculator for Italian Municipalities 2025). It's a specialized tool for calculating tourist taxes for accommodation facilities across Italian municipalities according to 2025 municipal regulations.
 
 ### Key Features
-- Excel/CSV file processing for booking data from platforms like Booking.com
-- Automatic tourist tax calculation with configurable rates
-- Multi-month booking support with proper splitting across periods
-- Geographic analysis of guests by country
-- GECOS portal integration for tax reporting
-- Monthly reporting for compliance
-- Dark/light mode toggle
-- Authentication system
+- **Multi-Municipality Support**: Comprehensive database of Italian municipalities with specific tax rules (Rome, Milan, Florence, Venice, Naples, Bologna, etc.)
+- **Smart File Processing**: Excel/CSV file processing for booking data from platforms like Booking.com with flexible column mapping
+- **Dynamic Tax Calculation**: Municipality-specific rates, exemption ages, maximum taxable nights, and seasonal pricing
+- **Advanced Analytics**: Multi-month booking support, geographic analysis of guests by country, monthly compliance reporting
+- **Export Capabilities**: GECOS portal integration, CSV/PDF export functionality
+- **Modern UI**: Dark/light mode toggle, responsive design, integrated help system
+- **Data Persistence**: Authentication system, manual exemptions, user preferences via localStorage
 
 ## Development Commands
 
@@ -50,6 +49,7 @@ The application follows a modern React pattern with a main component (`TassaSogg
 - **LoginScreen**: Authentication component with hardcoded credentials (admin/gecos2024)
 - **useBookingProcessor**: Custom hook containing all core business logic for file processing and calculations
 - **Component Library**: Modular components in `/src/components/` for specific UI sections
+- **GuidePage**: Integrated help system with step-by-step user guide modal
 
 ### Core Business Logic (useBookingProcessor Hook)
 The heart of the application is the `useBookingProcessor` custom hook which handles:
@@ -174,6 +174,7 @@ src/
 │   ├── ConfigPanel.js
 │   ├── FileUpload.js
 │   ├── GuidaGECOS.js
+│   ├── GuidePage.js       # Integrated user guide modal
 │   ├── Header.js
 │   ├── InfoFooter.js
 │   ├── LoginScreen.js
@@ -191,6 +192,6 @@ src/
 ## Important Constants & Functions
 - **Dynamic Rules**: Tax rules retrieved via `getRegolaComune()` function (useBookingProcessor.js:25)
 - **Municipality Selection**: Dropdown allows switching between predefined municipalities or custom configuration
-- **Default Rome Rules**: 10 nights max, €6.00 rate, under-10 exemption
+- **Municipality-Specific Rules**: Each municipality has unique tax rates, maximum nights, and exemption ages (e.g., Rome: 10 nights max, €6.00 rate, under-10 exemption; Milan: 14 nights max, €3.00 rate, under-10 exemption)
 - **Authentication credentials**: admin/gecos2024 (hardcoded in LoginScreen component:6-9)
 - **Manual Exemptions**: Persistent exemption system via localStorage

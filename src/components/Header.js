@@ -1,4 +1,12 @@
 import React from 'react';
+import { 
+  LockClosedIcon, 
+  BoltIcon,
+  BookOpenIcon,
+  SunIcon,
+  MoonIcon,
+  ArrowRightOnRectangleIcon
+} from '@heroicons/react/24/outline';
 
 const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
   return (
@@ -13,11 +21,27 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
           }`}>
             Calcolatore Tassa di Soggiorno
           </h1>
-          <p className={`text-sm sm:text-base lg:text-lg ${
+          <p className={`text-base sm:text-lg lg:text-xl ${
             darkMode ? 'text-gray-400' : 'text-gray-600'
           }`}>
             Italia 2025 • Multi-Comune • Report CSV/PDF
           </p>
+          
+          {/* Badges */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${
+              darkMode ? 'bg-green-600 text-white' : 'bg-green-500 text-white'
+            } shadow-sm`}>
+              <LockClosedIcon className="w-4 h-4 mr-2" />
+              <span>0% Commissioni</span>
+            </div>
+            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${
+              darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+            } shadow-sm`}>
+              <BoltIcon className="w-4 h-4 mr-2" />
+              <span>SEO Ottimizzato</span>
+            </div>
+          </div>
         </div>
         
         {/* Mobile-first buttons: horizontal on mobile, with better touch targets */}

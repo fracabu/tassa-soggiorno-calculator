@@ -4,6 +4,7 @@
   "description": "Calcolatore Tassa di Soggiorno Roma 2025",
   "author": "Il Tuo Nome",
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "d3": "^7.8.5",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",

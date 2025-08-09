@@ -51,7 +51,7 @@ const ResultsCards = ({ results, darkMode, prenotazioni, filtroMese }) => {
           <div className="text-2xl sm:text-xl font-semibold text-green-600 mb-2 sm:mb-1">
             €{filteredStats.totaleIncassi.toFixed(2)}
           </div>
-          <div className={`text-sm sm:text-xs ${
+          <div className={`text-base sm:text-sm ${
             darkMode ? 'text-gray-400' : 'text-gray-500'
           }`}>Incassi {filtroMese ? 'del Mese' : 'Totali'}</div>
         </div>
@@ -64,7 +64,7 @@ const ResultsCards = ({ results, darkMode, prenotazioni, filtroMese }) => {
           <div className="text-2xl sm:text-xl font-semibold text-blue-600 mb-2 sm:mb-1">
             {filteredStats.prenotazioniTassabili}
           </div>
-          <div className={`text-sm sm:text-xs ${
+          <div className={`text-base sm:text-sm ${
             darkMode ? 'text-gray-400' : 'text-gray-500'
           }`}>Prenotazioni Valide</div>
         </div>
@@ -77,7 +77,7 @@ const ResultsCards = ({ results, darkMode, prenotazioni, filtroMese }) => {
           <div className="text-2xl sm:text-xl font-semibold text-red-600 mb-2 sm:mb-1">
             {filteredStats.prenotazioneCancellate}
           </div>
-          <div className={`text-sm sm:text-xs ${
+          <div className={`text-base sm:text-sm ${
             darkMode ? 'text-gray-400' : 'text-gray-500'
           }`}>Cancellate</div>
         </div>
@@ -92,7 +92,7 @@ const ResultsCards = ({ results, darkMode, prenotazioni, filtroMese }) => {
           }`}>
             {filteredStats.totaleTotale}
           </div>
-          <div className={`text-sm sm:text-xs ${
+          <div className={`text-base sm:text-sm ${
             darkMode ? 'text-gray-400' : 'text-gray-500'
           }`}>Totale Prenotazioni</div>
         </div>
