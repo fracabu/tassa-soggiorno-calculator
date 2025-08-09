@@ -90,8 +90,8 @@ const TassaSoggiornoCalculator = () => {
   return (
     <div className={`min-h-screen ${
       darkMode ? 'bg-gray-900' : 'bg-gray-50'
-    } p-2`}>
-      <div className="max-w-6xl mx-auto flex flex-col">
+    } p-2 flex justify-center`}>
+      <div className="max-w-6xl w-full flex flex-col">
         <Header 
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
@@ -99,8 +99,8 @@ const TassaSoggiornoCalculator = () => {
           onShowGuida={() => setShowGuida(true)}
         />
 
-        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-4 items-start justify-items-center mb-6 ${
-          !prenotazioni.length ? 'flex-1 min-h-[60vh] items-center' : ''
+        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-4 justify-items-center mb-6 ${
+          !prenotazioni.length ? 'flex-1 min-h-[70vh] items-center' : 'items-start'
         }`}>
           {/* Step 1: Configurazione */}
           <div className={`${
