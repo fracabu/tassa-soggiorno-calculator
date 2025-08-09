@@ -12,6 +12,7 @@ const useBookingProcessor = () => {
   const [datiMensili, setDatiMensili] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [esenzioniManuali, setEsenzioniManuali] = useState(new Set());
 
   const MAX_NOTTI_TASSABILI = 10;
   const ETA_ESENZIONE_BAMBINI = 10;
@@ -21,7 +22,7 @@ const useBookingProcessor = () => {
     setCurrentPage(1);
   }, [filtroMese, itemsPerPage]);
 
-  // Ricalcola quando cambia la tariffa
+  // Ricalcola quando cambia la tariffa o le esenzioni
   useEffect(() => {
     if (prenotazioni.length > 0) {
       processPrenotazioni(prenotazioni.map(p => ({
@@ -35,7 +36,7 @@ const useBookingProcessor = () => {
         paese: p.paese
       })));
     }
-  }, [tariffePersonalizzate]);
+  }, [tariffePersonalizzate, esenzioniManuali]);
 
   const handleFileUpload = async (file) => {
     if (!file) return;
@@ -95,13 +96,13 @@ const useBookingProcessor = () => {
         obj[header] = row[i];
       });
       
-      const nome = obj['Booker'] || obj['Nome'] || obj['Guest Name'] || `Ospite ${index + 1}`;
+      const nome = obj['Nome ospite(i)'] || obj['Prenotato da'] || obj['Booker'] || obj['Nome'] || obj['Guest Name'] || `Ospite ${index + 1}`;
       const persone = parseInt(obj['Persone'] || obj['Ospiti'] || obj['Adults'] || obj['Total Guests'] || 1);
       const bambini = parseInt(obj['Bambini'] || obj['Children'] || 0);
       const paese = obj['Booker country'] || obj['Paese'] || obj['Country'] || 'IT';
       const stato = mapStatus(obj['Stato'] || obj['Status'] || 'OK');
       
-      const etaBambiniStr = obj['Età Bambini'] || obj['Children Ages'] || '';
+      const etaBambiniStr = obj['Età dei bambini'] || obj['Età Bambini'] || obj['Children Ages'] || '';
       const etaBambini = etaBambiniStr ? 
         etaBambiniStr.toString().split(',').map(eta => parseInt(eta.trim())).filter(eta => !isNaN(eta)) : 
         [];
@@ -161,9 +162,9 @@ const useBookingProcessor = () => {
 
   const mapStatus = (status) => {
     if (!status) return 'OK';
-    const statusLower = status.toString().toLowerCase();
+    const statusLower = status.toString().toLowerCase().trim();
     if (statusLower.includes('cancel') || statusLower.includes('annull')) return 'Cancellata';
-    if (statusLower.includes('no-show') || statusLower.includes('mancata')) return 'Mancata presentazione';
+    if (statusLower.includes('no_show') || statusLower.includes('no-show') || statusLower === 'no_show' || statusLower.includes('mancata')) return 'Mancata presentazione';
     if (statusLower === 'ok') return 'OK';
     return 'OK';
   };
@@ -184,7 +185,7 @@ const useBookingProcessor = () => {
       }
       
       let tassaTotale = 0;
-      if (prenotazione.stato === "OK") {
+      if (prenotazione.stato === "OK" && !esenzioniManuali.has(prenotazione.nome)) {
         tassaTotale = adultiTassabili * nottiTassabili * tariffePersonalizzate;
       }
       
@@ -313,6 +314,16 @@ const useBookingProcessor = () => {
     }
   };
 
+  const toggleEsenzione = (nomeOspite) => {
+    const newEsenzioni = new Set(esenzioniManuali);
+    if (newEsenzioni.has(nomeOspite)) {
+      newEsenzioni.delete(nomeOspite);
+    } else {
+      newEsenzioni.add(nomeOspite);
+    }
+    setEsenzioniManuali(newEsenzioni);
+  };
+
   return {
     prenotazioni,
     results,
@@ -327,6 +338,8 @@ const useBookingProcessor = () => {
     setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
+    esenzioniManuali,
+    toggleEsenzione,
     handleFileUpload,
     exportResults,
     getCountryName

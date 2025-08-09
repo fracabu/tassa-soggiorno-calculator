@@ -25,8 +25,17 @@ npm start
 # Build for production
 npm run build
 
-# Run tests
+# Run tests (uses Create React App test runner)
 npm test
+
+# Run a single test file
+npm test -- --testNamePattern="specific test name"
+
+# Run tests in watch mode (default)
+npm test
+
+# Run tests once and exit
+npm test -- --watchAll=false
 
 # Eject from Create React App (irreversible)
 npm run eject
@@ -34,51 +43,118 @@ npm run eject
 
 ## Architecture Overview
 
-### Main Components Structure
-- **TassaSoggiornoCalculator**: Root component handling authentication and theme
+### Component Architecture
+The application follows a modern React pattern with a main component (`TassaSoggiornoCalculator` in `App.js`) that orchestrates the entire application flow:
+
+- **TassaSoggiornoCalculator**: Root component handling authentication, theme management, and overall application state
 - **LoginScreen**: Authentication component with hardcoded credentials (admin/gecos2024)
-- **MainApp**: Main application containing all business logic
-- **GuidaGECOS**: Modal component with step-by-step GECOS portal guide
-- **WorldMap**: D3.js-powered visualization for guest country analysis
+- **useBookingProcessor**: Custom hook containing all core business logic for file processing and calculations
+- **Component Library**: Modular components in `/src/components/` for specific UI sections
 
-### Core Business Logic
-- **Tourist Tax Calculation**: Max 10 nights per booking, children under 10 exempted
-- **File Processing**: Supports Excel (.xlsx/.xls) and CSV formats with flexible column mapping
-- **Monthly Data Splitting**: Handles bookings spanning multiple months for GECOS reporting
-- **Country Analysis**: Maps country codes to names and provides visual statistics
+### Core Business Logic (useBookingProcessor Hook)
+The heart of the application is the `useBookingProcessor` custom hook which handles:
 
-### Key Libraries
-- **XLSX**: Excel file processing
-- **Papa Parse**: CSV file processing  
-- **D3.js**: Data visualization for country statistics
-- **Lodash**: Utility functions
-- **Math.js**: Mathematical calculations
-- **Lucide React**: Icons
+- **File Processing**: Flexible parsing of Excel (.xlsx/.xls) and CSV files with intelligent column mapping
+- **Tourist Tax Calculation**: 
+  - Max 10 taxable nights per booking
+  - Children under 10 are exempted from tax
+  - Configurable tax rates (default €6.00)
+- **Data Transformation**: Maps various input formats (Booking.com exports, custom CSV) to internal structure
+- **Monthly Analysis**: Splits bookings across months for GECOS portal reporting
+- **Export Functionality**: CSV export of processed results
 
-### Styling
-- **Tailwind CSS**: Primary styling framework
+### Key Libraries & Dependencies
+- **XLSX**: Excel file processing (`^0.18.5`)
+- **Papa Parse**: CSV file processing (`^5.4.1`)
+- **D3**: Data visualization for country statistics (`^7.8.5`)
+- **Lodash**: Utility functions (`^4.17.21`)
+- **Math.js**: Mathematical calculations (`^11.11.0`)
+- **Lucide React**: Icon library (`^0.263.1`)
+- **React**: Core framework (`^18.2.0`) with Create React App (`5.0.1`)
+- **Web Vitals**: Performance monitoring (`^5.0.3`)
+
+### Styling & UI
+- **Tailwind CSS**: Primary styling framework (`^3.4.1`)
 - **PostCSS**: CSS processing with autoprefixer
-- Responsive design with dark mode support
+- Fully responsive design with comprehensive dark mode support
+- Custom color schemes and animations
 
-### State Management
-- Uses React hooks (useState, useEffect) for local state
-- LocalStorage for authentication and theme persistence
-- No external state management library
+### State Management Pattern
+- React hooks (`useState`, `useEffect`) for local state management
+- `localStorage` for persistence of authentication and theme preferences
+- Custom hook pattern (`useBookingProcessor`) for complex business logic encapsulation
+- No external state management library (Redux, Zustand, etc.)
 
-### Data Flow
-1. User uploads Excel/CSV file with booking data
-2. File is parsed and mapped to internal data structure
-3. Tourist tax calculated based on configurable rates
-4. Monthly breakdown generated for GECOS reporting
-5. Results displayed in tables with export functionality
+### Data Flow Architecture
+1. **Authentication**: User authenticates via `LoginScreen` component
+2. **File Upload**: User uploads Excel/CSV file via `FileUpload` component
+3. **Processing**: `useBookingProcessor` hook parses and transforms data
+4. **Calculation**: Tax calculations applied based on business rules
+5. **Display**: Results shown in `ResultsCards` and `BookingsTable` components
+6. **Export**: Processed data exported as CSV for GECOS portal submission
 
-## File Structure Patterns
-- Single large component file (`App.js`) containing all functionality
-- Standard Create React App structure
-- Configuration files for Tailwind CSS and PostCSS in root
+## File Processing Details
+
+### Supported File Formats
+- **Excel**: `.xlsx`, `.xls` files processed via XLSX library
+- **CSV**: Standard CSV files with automatic delimiter detection
+
+### Column Mapping Strategy
+The application uses flexible column mapping to handle various export formats:
+
+**Excel Mapping** (`mapExcelData` function):
+- Guest names: `'Booker'`, `'Nome'`, `'Guest Name'`
+- Guest count: `'Persone'`, `'Ospiti'`, `'Adults'`, `'Total Guests'`
+- Children: `'Bambini'`, `'Children'`
+- Country: `'Booker country'`, `'Paese'`, `'Country'`
+- Dates: `'Arrivo'`, `'Check-in'` / `'Partenza'`, `'Check-out'`
+
+**CSV Mapping** (`mapCsvData` function):
+- Similar mapping with additional flexibility for custom formats
+
+### Business Rules Implementation
+- **MAX_NOTTI_TASSABILI**: 10 nights maximum per booking
+- **ETA_ESENZIONE_BAMBINI**: Children under 10 exempted
+- **Status Mapping**: Handles cancellations and no-shows
+- **Date Formatting**: Robust date parsing for various formats including Excel serial dates
 
 ## Development Notes
-- The README.md appears to be generated with batch commands rather than traditional markdown
-- No test files exist beyond the default Create React App setup
-- Hard-coded authentication credentials should be externalized for production use
-- Component could benefit from being split into smaller, more focused components
+
+### Authentication System
+- Hardcoded credentials: `admin` / `gecos2024` (should be externalized for production)
+- Session persistence via `localStorage`
+- Simple boolean authentication state
+
+### Component Structure Considerations
+- Main logic concentrated in single `App.js` file and `useBookingProcessor` hook
+- Could benefit from further component decomposition for maintainability
+- Business logic properly separated into custom hook
+
+### Project Structure
+```
+src/
+├── App.js                 # Main component with authentication and theme logic
+├── hooks/
+│   └── useBookingProcessor.js  # Core business logic hook
+├── components/            # UI components
+│   ├── BookingsTable.js
+│   ├── ConfigPanel.js
+│   ├── FileUpload.js
+│   ├── GuidaGECOS.js
+│   ├── Header.js
+│   ├── InfoFooter.js
+│   ├── LoginScreen.js
+│   └── ResultsCards.js
+└── index.js              # App entry point
+```
+
+### Configuration Files
+- `tailwind.config.js`: Standard Tailwind configuration for React
+- `postcss.config.js`: PostCSS with Tailwind and Autoprefixer
+- Standard Create React App structure maintained
+
+## Important Constants
+- **MAX_NOTTI_TASSABILI**: 10 nights maximum per booking (in useBookingProcessor.js:16)
+- **ETA_ESENZIONE_BAMBINI**: Children under 10 exempted (in useBookingProcessor.js:17)
+- **Default tax rate**: €6.00 per night per adult guest
+- **Authentication credentials**: admin/gecos2024 (hardcoded in LoginScreen component)

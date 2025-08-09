@@ -35,6 +35,8 @@ const TassaSoggiornoCalculator = () => {
     setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
+    esenzioniManuali,
+    toggleEsenzione,
     handleFileUpload,
     exportResults,
     getCountryName
@@ -125,6 +127,8 @@ const TassaSoggiornoCalculator = () => {
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
           tariffePersonalizzate={tariffePersonalizzate}
+          esenzioniManuali={esenzioniManuali}
+          toggleEsenzione={toggleEsenzione}
           onExport={exportResults}
           getCountryName={getCountryName}
         />

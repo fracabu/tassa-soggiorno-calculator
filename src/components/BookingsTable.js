@@ -9,6 +9,8 @@ const BookingsTable = ({
   itemsPerPage,
   setItemsPerPage,
   tariffePersonalizzate,
+  esenzioniManuali,
+  toggleEsenzione,
   onExport,
   getCountryName
 }) => {
@@ -228,6 +230,11 @@ const BookingsTable = ({
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   darkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
+                  Esente
+                </th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  darkMode ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Tassa
                 </th>
               </tr>
@@ -301,6 +308,23 @@ const BookingsTable = ({
                     }`}>
                       {prenotazione.stato}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={esenzioniManuali.has(prenotazione.nome)}
+                        onChange={() => toggleEsenzione(prenotazione.nome)}
+                        className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${
+                          darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white'
+                        }`}
+                      />
+                      <span className={`ml-2 text-xs ${
+                        darkMode ? 'text-gray-300' : 'text-gray-600'
+                      }`}>
+                        {esenzioniManuali.has(prenotazione.nome) ? 'Sì' : 'No'}
+                      </span>
+                    </label>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className={`text-sm font-medium ${
