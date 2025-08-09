@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const useBookingProcessor = () => {
   const [prenotazioni, setPrenotazioni] = useState([]);
@@ -279,7 +281,7 @@ const useBookingProcessor = () => {
     return countries[code?.toLowerCase()] || code?.toUpperCase() || 'Sconosciuto';
   };
 
-  const exportResults = () => {
+  const exportResultsCSV = () => {
     if (!prenotazioni || prenotazioni.length === 0) return;
     
     const csvData = prenotazioni.map(p => ({
@@ -294,23 +296,92 @@ const useBookingProcessor = () => {
       'Notti': p.notti,
       'Notti Tassabili': p.nottiTassabili,
       'Stato': p.stato,
-      'Tassa Totale (€)': p.tassaTotale.toFixed(2)
+      'Esente Manuale': esenzioniManuali.has(p.nome) ? 'Sì' : 'No',
+      'Tassa Totale': p.tassaTotale.toFixed(2)
     }));
     
     try {
-      const csv = Papa.unparse(csvData);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      // Configurazione Papa Parse per CSV ben formattato
+      const csv = Papa.unparse(csvData, {
+        delimiter: ';',
+        header: true,
+        encoding: 'utf-8'
+      });
+      
+      // Aggiungi BOM per Excel
+      const csvWithBOM = '\uFEFF' + csv;
+      
+      const blob = new Blob([csvWithBOM], { 
+        type: 'text/csv;charset=utf-8;' 
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'tassa_soggiorno_dettaglio.csv';
+      a.download = `tassa_soggiorno_${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Errore nell\'export:', error);
+      console.error('Errore nell\'export CSV:', error);
       alert('Errore durante l\'export del CSV. Riprova.');
+    }
+  };
+
+  const exportResultsPDF = () => {
+    if (!prenotazioni || prenotazioni.length === 0) return;
+    
+    try {
+      const doc = new jsPDF();
+      
+      // Header
+      doc.setFontSize(16);
+      doc.text('Dettaglio Tassa di Soggiorno Roma 2025', 14, 15);
+      
+      doc.setFontSize(10);
+      doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 14, 25);
+      
+      // Riepilogo
+      if (results) {
+        doc.text(`Prenotazioni tassabili: ${results.prenotazioniTassabili}`, 14, 35);
+        doc.text(`Totale incassi: €${results.totaleIncassi.toFixed(2)}`, 14, 40);
+        doc.text(`Tariffa per persona/notte: €${tariffePersonalizzate.toFixed(2)}`, 14, 45);
+      }
+      
+      // Tabella
+      const tableData = prenotazioni.map(p => [
+        p.nome,
+        getCountryName(p.paese),
+        p.ospiti.toString(),
+        p.adultiTassabili.toString(),
+        p.arrivo,
+        p.partenza,
+        p.notti.toString(),
+        p.nottiTassabili.toString(),
+        p.stato,
+        esenzioniManuali.has(p.nome) ? 'Sì' : 'No',
+        `€${p.tassaTotale.toFixed(2)}`
+      ]);
+      
+      autoTable(doc, {
+        head: [[
+          'Nome', 'Paese', 'Ospiti', 'Tassabili', 
+          'Arrivo', 'Partenza', 'Notti', 'N.Tass', 
+          'Stato', 'Esente', 'Tassa'
+        ]],
+        body: tableData,
+        startY: 55,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [41, 128, 185] },
+        columnStyles: {
+          10: { halign: 'right' } // Align tassa column to right
+        }
+      });
+      
+      doc.save(`tassa_soggiorno_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Errore nell\'export PDF:', error);
+      alert('Errore durante l\'export del PDF. Riprova.');
     }
   };
 
@@ -341,7 +412,8 @@ const useBookingProcessor = () => {
     esenzioniManuali,
     toggleEsenzione,
     handleFileUpload,
-    exportResults,
+    exportResultsCSV,
+    exportResultsPDF,
     getCountryName
   };
 };

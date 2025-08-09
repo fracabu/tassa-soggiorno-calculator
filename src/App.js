@@ -38,7 +38,8 @@ const TassaSoggiornoCalculator = () => {
     esenzioniManuali,
     toggleEsenzione,
     handleFileUpload,
-    exportResults,
+    exportResultsCSV,
+    exportResultsPDF,
     getCountryName
   } = useBookingProcessor();
 
@@ -129,7 +130,8 @@ const TassaSoggiornoCalculator = () => {
           tariffePersonalizzate={tariffePersonalizzate}
           esenzioniManuali={esenzioniManuali}
           toggleEsenzione={toggleEsenzione}
-          onExport={exportResults}
+          onExportCSV={exportResultsCSV}
+          onExportPDF={exportResultsPDF}
           getCountryName={getCountryName}
         />
 

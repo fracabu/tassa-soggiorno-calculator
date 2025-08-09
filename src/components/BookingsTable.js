@@ -11,7 +11,8 @@ const BookingsTable = ({
   tariffePersonalizzate,
   esenzioniManuali,
   toggleEsenzione,
-  onExport,
+  onExportCSV,
+  onExportPDF,
   getCountryName
 }) => {
   // Logiche di paginazione
@@ -178,12 +179,20 @@ const BookingsTable = ({
             <option value={50}>50 per pagina</option>
             <option value={100}>100 per pagina</option>
           </select>
-          <button
-            onClick={onExport}
-            className="px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base sm:text-sm min-h-[44px] sm:min-h-0"
-          >
-            Esporta CSV
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={onExportCSV}
+              className="px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base sm:text-sm min-h-[44px] sm:min-h-0"
+            >
+              Esporta CSV
+            </button>
+            <button
+              onClick={onExportPDF}
+              className="px-4 py-3 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-base sm:text-sm min-h-[44px] sm:min-h-0"
+            >
+              Esporta PDF
+            </button>
+          </div>
         </div>
       </div>
       

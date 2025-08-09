@@ -5,6 +5,8 @@
   "author": "Il Tuo Nome",
   "dependencies": {
     "d3": "^7.8.5",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.263.1",
     "mathjs": "^11.11.0",
