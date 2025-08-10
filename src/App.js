@@ -88,10 +88,10 @@ const TassaSoggiornoCalculator = () => {
   }
 
   return (
-    <div className={`min-h-screen ${
+    <div className={`min-h-screen overflow-x-hidden ${
       darkMode ? 'bg-gray-900' : 'bg-gray-50'
-    } p-2 flex justify-center`}>
-        <div className="max-w-6xl w-full flex flex-col">
+    } p-2 sm:p-4 flex justify-center`}>
+        <div className="max-w-7xl w-full flex flex-col overflow-x-hidden">
           <Header 
             darkMode={darkMode}
             toggleDarkMode={toggleDarkMode}
@@ -99,15 +99,15 @@ const TassaSoggiornoCalculator = () => {
             onShowGuida={() => setShowGuida(true)}
           />
 
-        <div className="mb-6">
-          <div className={`grid grid-cols-1 lg:grid-cols-3 gap-4 justify-items-center ${
-            !prenotazioni.length ? 'flex-1 min-h-[70vh] items-center' : 'items-start'
+        <div className="mb-4 sm:mb-6 overflow-x-hidden">
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full ${
+            !prenotazioni.length ? 'flex-1 min-h-[60vh] items-center justify-items-center' : 'items-start'
           }`}>
           {/* Step 1: Configurazione */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } rounded-lg border p-6 w-full flex flex-col max-w-sm ${
-            !prenotazioni.length ? 'aspect-square' : 'min-h-[200px]'
+          } rounded-lg border p-4 sm:p-6 w-full flex flex-col overflow-x-hidden ${
+            !prenotazioni.length ? 'min-h-[280px] sm:aspect-square' : 'min-h-[200px]'
           }`}>
             <div className="text-center mb-4">
               <span className={`inline-flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold mb-2 ${
@@ -214,8 +214,8 @@ const TassaSoggiornoCalculator = () => {
           {/* Step 2: Upload File */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } rounded-lg border p-6 w-full flex flex-col max-w-sm ${
-            !prenotazioni.length ? 'aspect-square' : 'min-h-[200px]'
+          } rounded-lg border p-4 sm:p-6 w-full flex flex-col overflow-x-hidden ${
+            !prenotazioni.length ? 'min-h-[280px] sm:aspect-square' : 'min-h-[200px]'
           }`}>
             <div className="text-center mb-4">
               <span className={`inline-flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold mb-2 ${
@@ -258,7 +258,7 @@ const TassaSoggiornoCalculator = () => {
                       setFiltroMese('');
                       setDatiMensili(null);
                     }}
-                    className={`mt-2 text-sm px-3 py-1 rounded ${
+                    className={`mt-3 text-sm px-4 py-2 rounded-lg min-h-[36px] transition-colors ${
                       darkMode 
                         ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
@@ -274,8 +274,8 @@ const TassaSoggiornoCalculator = () => {
           {/* Step 3: Risultati */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } rounded-lg border p-6 w-full flex flex-col max-w-sm ${
-            !prenotazioni.length ? 'aspect-square' : 'min-h-[200px]'
+          } rounded-lg border p-4 sm:p-6 w-full flex flex-col overflow-x-hidden ${
+            !prenotazioni.length ? 'min-h-[280px] sm:aspect-square md:col-span-2 lg:col-span-1' : 'min-h-[200px]'
           }`}>
             <div className="text-center mb-4">
               <span className={`inline-flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold mb-2 ${
@@ -324,26 +324,28 @@ const TassaSoggiornoCalculator = () => {
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <button
                       onClick={exportResultsCSV}
-                      className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center space-x-2 ${
                         darkMode 
                           ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                           : 'bg-blue-500 hover:bg-blue-600 text-white'
                       }`}
                     >
-                      📊 CSV
+                      <span>📊</span>
+                      <span>Scarica CSV</span>
                     </button>
                     <button
                       onClick={exportResultsPDF}
-                      className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-colors min-h-[44px] flex items-center justify-center space-x-2 ${
                         darkMode 
                           ? 'bg-red-600 hover:bg-red-700 text-white' 
                           : 'bg-red-500 hover:bg-red-600 text-white'
                       }`}
                     >
-                      📄 PDF
+                      <span>📄</span>
+                      <span>Scarica PDF</span>
                     </button>
                   </div>
                 </div>
@@ -358,7 +360,7 @@ const TassaSoggiornoCalculator = () => {
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
           } rounded-lg border p-4 sm:p-5 mb-3 sm:mb-4`}>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
               <label className={`text-base font-medium ${
                 darkMode ? 'text-gray-200' : 'text-gray-700'
               }`}>
@@ -367,7 +369,7 @@ const TassaSoggiornoCalculator = () => {
               <select
                 value={filtroMese}
                 onChange={(e) => setFiltroMese(e.target.value)}
-                className={`p-2 rounded-lg border text-sm ${
+                className={`p-3 sm:p-2 rounded-lg border text-base sm:text-sm min-h-[44px] sm:min-h-0 flex-1 sm:flex-none sm:min-w-[200px] ${
                   darkMode 
                     ? 'bg-gray-700 border-gray-600 text-white' 
                     : 'bg-white border-gray-300 text-gray-900'

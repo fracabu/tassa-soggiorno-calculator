@@ -12,11 +12,11 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
   return (
     <div className={`${
       darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    } rounded-lg border p-3 mb-2`}>
+    } rounded-lg border p-3 mb-2 overflow-x-hidden`}>
       {/* Mobile-first layout: stack vertically on small screens */}
-      <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
+      <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center w-full overflow-x-hidden">
         <div className="text-center sm:text-left">
-          <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-semibold mb-1 sm:mb-2 ${
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-semibold mb-1 sm:mb-2 break-words ${
             darkMode ? 'text-white' : 'text-gray-900'
           }`}>
             Calcolatore Tassa di Soggiorno

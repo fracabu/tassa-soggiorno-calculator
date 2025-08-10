@@ -49,7 +49,7 @@ const BookingsTable = ({
   const BookingCard = ({ prenotazione, index }) => (
     <div key={index} className={`${
       darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
-    } rounded-lg border p-4 mb-3`}>
+    } rounded-lg border p-4 mb-3 shadow-sm`}>
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           <h3 className={`font-medium text-base ${
@@ -109,15 +109,20 @@ const BookingsTable = ({
         </div>
       </div>
       
-      <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-300 dark:border-gray-600">
-        <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 pt-3 border-t border-gray-300 dark:border-gray-600 gap-2">
+        <div className="flex-1">
           <span className={`text-sm font-medium ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
           }`}>
             Notti tassabili: {prenotazione.nottiTassabili}
           </span>
+          {esenzioniManuali.has(prenotazione.nome) && (
+            <span className="ml-2 inline-flex px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+              Esentato manualmente
+            </span>
+          )}
         </div>
-        <div className="text-right">
+        <div className="text-right flex-shrink-0">
           <div className={`text-lg font-semibold ${
             darkMode ? 'text-white' : 'text-gray-900'
           }`}>
@@ -130,6 +135,21 @@ const BookingsTable = ({
               {prenotazione.adultiTassabili} × {prenotazione.nottiTassabili} × €{tariffePersonalizzate.toFixed(2)}
             </div>
           )}
+          <label className="flex items-center mt-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={esenzioniManuali.has(prenotazione.nome)}
+              onChange={() => toggleEsenzione(prenotazione.nome)}
+              className={`h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${
+                darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white'
+              }`}
+            />
+            <span className={`ml-1 text-xs ${
+              darkMode ? 'text-gray-300' : 'text-gray-600'
+            }`}>
+              Esenta
+            </span>
+          </label>
         </div>
       </div>
     </div>
@@ -138,7 +158,7 @@ const BookingsTable = ({
   return (
     <div className={`${
       darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-    } rounded-lg border p-4 sm:p-6 mb-4 sm:mb-6`}>
+    } rounded-lg border p-4 sm:p-6 mb-4 sm:mb-6 overflow-x-hidden`}>
       {/* Header - Mobile First */}
       <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
         <div>
@@ -207,15 +227,23 @@ const BookingsTable = ({
       </div>
       
       {/* Mobile View - Cards */}
-      <div className="block lg:hidden">
-        {paginatedBookings.map((prenotazione, index) => (
-          <BookingCard key={index} prenotazione={prenotazione} index={index} />
-        ))}
+      <div className="block lg:hidden space-y-3">
+        {paginatedBookings.length === 0 ? (
+          <div className={`text-center py-8 ${
+            darkMode ? 'text-gray-400' : 'text-gray-500'
+          }`}>
+            <p>Nessuna prenotazione trovata per questo periodo.</p>
+          </div>
+        ) : (
+          paginatedBookings.map((prenotazione, index) => (
+            <BookingCard key={index} prenotazione={prenotazione} index={index} />
+          ))
+        )}
       </div>
 
       {/* Desktop View - Table */}
       <div className="hidden lg:block">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-4 sm:-mx-6 px-4 sm:px-6">
           <table className="w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
             <thead className={`${
               darkMode ? 'bg-gray-700' : 'bg-gray-50'
