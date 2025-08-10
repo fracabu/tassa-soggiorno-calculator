@@ -8,35 +8,35 @@ This is a React-based web application called "Calcolatore Tassa di Soggiorno - C
 
 ### Key Features
 - **Multi-Municipality Support**: Comprehensive database of Italian municipalities with specific tax rules (Rome, Milan, Florence, Venice, Naples, Bologna, etc.)
-- **Smart File Processing**: Excel/CSV file processing for booking data from platforms like Booking.com with flexible column mapping
+- **Smart File Processing**: Excel/CSV file processing for booking data from platforms like Booking.com, Airbnb with flexible column mapping
 - **Dynamic Tax Calculation**: Municipality-specific rates, exemption ages, maximum taxable nights, and seasonal pricing
 - **Advanced Analytics**: Multi-month booking support, geographic analysis of guests by country, monthly compliance reporting
-- **Export Capabilities**: GECOS portal integration, CSV/PDF export functionality
-- **Modern UI**: Dark/light mode toggle, responsive design, integrated help system
+- **Export Capabilities**: GECOS portal integration, CSV/PDF export functionality with proper encoding
+- **Modern UI**: Dark/light mode toggle, fully responsive design optimized for desktop/tablet/mobile, integrated help system
 - **Data Persistence**: Authentication system, manual exemptions, user preferences via localStorage
 
 ## Development Commands
 
 ```bash
-# Start development server
+# Start development server with hot reload
 npm start
 
-# Build for production
+# Build optimized production version
 npm run build
 
-# Run tests (uses Create React App test runner)
+# Run tests (uses Create React App test runner with Jest)
 npm test
 
-# Run a single test file
-npm test -- --testNamePattern="specific test name"
-
-# Run tests in watch mode (default)
+# Run tests in watch mode (default behavior)
 npm test
 
-# Run tests once and exit
+# Run tests once and exit (for CI/CD)
 npm test -- --watchAll=false
 
-# Eject from Create React App (irreversible)
+# Run specific test by name pattern
+npm test -- --testNamePattern="specific test name"
+
+# Eject from Create React App (irreversible - exposes webpack config)
 npm run eject
 ```
 
@@ -66,22 +66,24 @@ The heart of the application is the `useBookingProcessor` custom hook which hand
 - **Export Functionality**: CSV and PDF export of processed results with municipality-specific formatting
 
 ### Key Libraries & Dependencies
+- **React**: Core framework (`^18.2.0`) with Create React App (`5.0.1`)
 - **XLSX**: Excel file processing (`^0.18.5`)
 - **Papa Parse**: CSV file processing (`^5.4.1`)
 - **D3**: Data visualization for country statistics (`^7.8.5`)
-- **jsPDF**: PDF generation (`^3.0.1`)
-- **jsPDF-AutoTable**: PDF table generation (`^5.0.2`)
+- **jsPDF**: PDF generation (`^3.0.1`) with jsPDF-AutoTable (`^5.0.2`)
 - **Lodash**: Utility functions (`^4.17.21`)
 - **Math.js**: Mathematical calculations (`^11.11.0`)
-- **Lucide React**: Icon library (`^0.263.1`)
-- **React**: Core framework (`^18.2.0`) with Create React App (`5.0.1`)
+- **Lucide React**: Modern icon library (`^0.263.1`)
+- **Heroicons React**: Additional icon library (`^2.2.0`)
+- **Tailwind CSS**: Utility-first styling framework (`^3.4.1`)
 - **Web Vitals**: Performance monitoring (`^5.0.3`)
 
 ### Styling & UI
-- **Tailwind CSS**: Primary styling framework (`^3.4.1`)
-- **PostCSS**: CSS processing with autoprefixer
-- Fully responsive design with comprehensive dark mode support
-- Custom color schemes and animations
+- **Tailwind CSS**: Utility-first CSS framework with custom configuration
+- **PostCSS**: CSS processing with autoprefixer and Tailwind integration
+- **Responsive Design**: Mobile-first approach optimized for desktop, tablet, and mobile
+- **Dark Mode**: Complete light/dark theme toggle with user preference persistence
+- **Icons**: Lucide React and Heroicons for consistent iconography
 
 ### State Management Pattern
 - React hooks (`useState`, `useEffect`) for local state management
@@ -190,8 +192,24 @@ src/
 - Standard Create React App structure maintained
 
 ## Important Constants & Functions
+
+### Core Business Logic
 - **Dynamic Rules**: Tax rules retrieved via `getRegolaComune()` function (useBookingProcessor.js:25)
-- **Municipality Selection**: Dropdown allows switching between predefined municipalities or custom configuration
-- **Municipality-Specific Rules**: Each municipality has unique tax rates, maximum nights, and exemption ages (e.g., Rome: 10 nights max, €6.00 rate, under-10 exemption; Milan: 14 nights max, €3.00 rate, under-10 exemption)
-- **Authentication credentials**: admin/gecos2024 (hardcoded in LoginScreen component:6-9)
-- **Manual Exemptions**: Persistent exemption system via localStorage
+- **Municipality Database**: Complete Italian municipalities data in `comuniItaliani.js` with specific regulations
+- **File Processing**: Flexible column mapping for Excel/CSV files from various booking platforms
+- **Tax Calculation**: Municipality-specific rates with seasonal support and age-based exemptions
+
+### Key Configuration Points  
+- **Authentication**: Hardcoded credentials `admin`/`gecos2024` (LoginScreen.js)
+- **Municipality Rules**: Each municipality has unique tax rates, maximum nights, and exemption ages
+  - Rome: 10 nights max, €6.00 rate, under-10 exemption
+  - Milan: 14 nights max, €3.00 rate, under-10 exemption  
+  - Florence: 7 nights max, €4.50 rate, under-12 exemption, seasonal rates
+  - Venice: 5 nights max, €4.00 rate, under-10 exemption, seasonal rates
+- **Data Persistence**: Manual exemptions and preferences via localStorage
+- **Export Formats**: CSV with UTF-8 encoding and Italian separators, PDF with municipality headers
+
+### Security & Privacy Notes
+- **Local Processing**: All file processing happens in browser, no server uploads
+- **No External Dependencies**: No CDN links, all libraries bundled locally
+- **Data Privacy**: Only UI preferences and manual exemptions stored locally
