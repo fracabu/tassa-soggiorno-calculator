@@ -18,8 +18,8 @@ const LoginScreen = ({ onLogin, darkMode, toggleDarkMode }) => {
   const [showGuide, setShowGuide] = useState(false);
 
   const validCredentials = {
-    username: 'admin',
-    password: 'gecos2024'
+    username: process.env.REACT_APP_ADMIN_USERNAME || 'admin',
+    password: process.env.REACT_APP_ADMIN_PASSWORD || 'gecos2024'
   };
 
   const handleLogin = (e) => {

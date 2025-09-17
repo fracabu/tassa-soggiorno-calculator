@@ -55,7 +55,7 @@ The application follows a modern React pattern with a main component (`TassaSogg
 The heart of the application is the `useBookingProcessor` custom hook which handles:
 
 - **File Processing**: Flexible parsing of Excel (.xlsx/.xls) and CSV files with intelligent column mapping
-- **Municipality-Aware Tax Calculation**: 
+- **Municipality-Aware Tax Calculation**:
   - Dynamic rules based on selected municipality (via `getRegolaComune()` function)
   - Municipality-specific maximum taxable nights (varies by location)
   - Age-based exemptions (configurable per municipality)
@@ -154,8 +154,10 @@ The application uses flexible column mapping to handle various export formats:
 - **Extensible Design**: Easy to add new municipalities with custom rules
 - Current municipalities include Rome, Milan, Florence, Venice, Naples, Bologna, and others
 
-### Authentication System  
-- Hardcoded credentials: `admin` / `gecos2024` (should be externalized for production)
+### Authentication System
+- Configurable credentials via environment variables in `.env.local`
+- Default credentials: `admin` / `gecos2024` (can be overridden)
+- Environment variables: `REACT_APP_ADMIN_USERNAME`, `REACT_APP_ADMIN_PASSWORD`
 - Session persistence via `localStorage`
 - Simple boolean authentication state
 
@@ -188,7 +190,7 @@ src/
 
 ### Configuration Files
 - `tailwind.config.js`: Standard Tailwind configuration for React
-- `postcss.config.js`: PostCSS with Tailwind and Autoprefixer  
+- `postcss.config.js`: PostCSS with Tailwind and Autoprefixer
 - Standard Create React App structure maintained
 
 ## Important Constants & Functions
@@ -199,11 +201,11 @@ src/
 - **File Processing**: Flexible column mapping for Excel/CSV files from various booking platforms
 - **Tax Calculation**: Municipality-specific rates with seasonal support and age-based exemptions
 
-### Key Configuration Points  
-- **Authentication**: Hardcoded credentials `admin`/`gecos2024` (LoginScreen.js)
+### Key Configuration Points
+- **Authentication**: Configurable via `.env.local` file with `REACT_APP_ADMIN_USERNAME`/`REACT_APP_ADMIN_PASSWORD` (LoginScreen.js)
 - **Municipality Rules**: Each municipality has unique tax rates, maximum nights, and exemption ages
   - Rome: 10 nights max, €6.00 rate, under-10 exemption
-  - Milan: 14 nights max, €3.00 rate, under-10 exemption  
+  - Milan: 14 nights max, €3.00 rate, under-10 exemption
   - Florence: 7 nights max, €4.50 rate, under-12 exemption, seasonal rates
   - Venice: 5 nights max, €4.00 rate, under-10 exemption, seasonal rates
 - **Data Persistence**: Manual exemptions and preferences via localStorage
