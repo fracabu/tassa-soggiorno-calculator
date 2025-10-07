@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 
 // Components
-import LoginScreen from './components/LoginScreen';
+import LandingPage from './components/LandingPage';
+import LoginPage from './components/LoginPage';
+import ResetPassword from './components/ResetPassword';
+import PrivateRoute from './components/PrivateRoute';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
+import CookiePolicy from './components/CookiePolicy';
+import AdminPage from './components/AdminPage';
 import Header from './components/Header';
 import ConfigPanel from './components/ConfigPanel';
 import FileUpload from './components/FileUpload';
@@ -18,7 +26,11 @@ import useBookingProcessor from './hooks/useBookingProcessor';
 // Database Comuni Italiani
 import { comuniItaliani, getTuttiComuni, getTariffaPerComune } from './data/comuniItaliani';
 
+// API Service
+import { logout as apiLogout, isAuthenticated as checkAuth } from './services/api';
+
 const TassaSoggiornoCalculator = () => {
+  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [showGuida, setShowGuida] = useState(false);
@@ -45,30 +57,34 @@ const TassaSoggiornoCalculator = () => {
     handleFileUpload,
     exportResultsCSV,
     exportResultsPDF,
-    getCountryName
+    getCountryName,
+    resetData
   } = useBookingProcessor(comuneSelezionato);
 
   // Check auth e theme on mount
   useEffect(() => {
-    const savedAuth = localStorage.getItem('taxCalculatorAuth');
+    setIsAuthenticated(checkAuth());
+
     const savedTheme = localStorage.getItem('darkMode');
-    
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
     if (savedTheme === 'true') {
       setDarkMode(true);
     }
   }, []);
 
-  const handleLogin = () => {
+  const handleRegisterSuccess = (data) => {
     setIsAuthenticated(true);
-    localStorage.setItem('taxCalculatorAuth', 'true');
+    navigate('/app');
+  };
+
+  const handleLoginSuccess = (data) => {
+    setIsAuthenticated(true);
+    navigate('/app');
   };
 
   const handleLogout = () => {
+    apiLogout();
     setIsAuthenticated(false);
-    localStorage.removeItem('taxCalculatorAuth');
+    navigate('/');
   };
 
   const toggleDarkMode = () => {
@@ -77,32 +93,93 @@ const TassaSoggiornoCalculator = () => {
     localStorage.setItem('darkMode', newDarkMode.toString());
   };
 
-  if (!isAuthenticated) {
-    return (
-      <LoginScreen 
-        onLogin={handleLogin}
-        darkMode={darkMode}
-        toggleDarkMode={toggleDarkMode}
-      />
-    );
-  }
-
   return (
+    <Routes>
+      {/* Home - Landing Page pubblica */}
+      <Route
+        path="/"
+        element={
+          <LandingPage
+            onRegisterSuccess={handleRegisterSuccess}
+            darkMode={darkMode}
+          />
+        }
+      />
+
+      {/* Rotta Login */}
+      <Route
+        path="/login"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/app" replace />
+          ) : (
+            <LoginPage
+              onLoginSuccess={handleLoginSuccess}
+              darkMode={darkMode}
+            />
+          )
+        }
+      />
+
+      {/* Rotta Reset Password */}
+      <Route
+        path="/reset-password"
+        element={<ResetPassword />}
+      />
+
+      {/* Rotte Legali */}
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/cookie-policy" element={<CookiePolicy />} />
+
+      {/* Rotta Admin */}
+      <Route
+        path="/admin"
+        element={
+          <PrivateRoute>
+            <AdminPage darkMode={darkMode} />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Rotta Register - mostra landing page con form registrazione */}
+      <Route
+        path="/register"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/app" replace />
+          ) : (
+            <LandingPage
+              onRegisterSuccess={handleRegisterSuccess}
+              darkMode={darkMode}
+            />
+          )
+        }
+      />
+
+      {/* Rotta Calcolatore - richiede autenticazione */}
+      <Route
+        path="/app"
+        element={
+          <PrivateRoute>
     <div className={`min-h-screen overflow-x-hidden ${
       darkMode ? 'bg-gray-900' : 'bg-gray-50'
-    } p-2 sm:p-4 flex justify-center`}>
-        <div className="max-w-7xl w-full flex flex-col overflow-x-hidden">
-          <Header 
-            darkMode={darkMode}
-            toggleDarkMode={toggleDarkMode}
-            onLogout={handleLogout}
-            onShowGuida={() => setShowGuida(true)}
-          />
+    }`}>
+      <Header
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
+        onLogout={handleLogout}
+        onShowGuida={() => setShowGuida(true)}
+      />
 
-        <div className="mb-4 sm:mb-6 overflow-x-hidden">
-          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full ${
-            !prenotazioni.length ? 'flex-1 min-h-[60vh] items-center justify-items-center' : 'items-start'
+      <div className="pt-20 px-2 sm:px-4 pb-4">
+        <div className="max-w-7xl mx-auto w-full flex flex-col overflow-x-hidden">
+          <div className={`mb-4 sm:mb-6 overflow-x-hidden ${
+            !prenotazioni.length ? 'flex items-center justify-center min-h-[calc(100vh-6rem)]' : ''
           }`}>
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full ${
+              !prenotazioni.length ? 'max-w-6xl' : ''
+            }`}>
           {/* Step 1: Configurazione */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -214,7 +291,7 @@ const TassaSoggiornoCalculator = () => {
           {/* Step 2: Upload File */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } rounded-lg border p-4 sm:p-6 w-full flex flex-col overflow-x-hidden ${
+          } rounded-lg border p-4 sm:p-6 w-full flex flex-col overflow-hidden ${
             !prenotazioni.length ? 'min-h-[280px] sm:aspect-square' : 'min-h-[200px]'
           }`}>
             <div className="text-center mb-4">
@@ -251,16 +328,10 @@ const TassaSoggiornoCalculator = () => {
                   <p className="text-base font-medium">File caricato</p>
                   <p className="text-sm">{prenotazioni.length} prenotazioni</p>
                   <button
-                    onClick={() => {
-                      setPrenotazioni([]);
-                      setResults(null);
-                      setError('');
-                      setFiltroMese('');
-                      setDatiMensili(null);
-                    }}
+                    onClick={resetData}
                     className={`mt-3 text-sm px-4 py-2 rounded-lg min-h-[36px] transition-colors ${
-                      darkMode 
-                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+                      darkMode
+                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
                     }`}
                   >
@@ -352,7 +423,7 @@ const TassaSoggiornoCalculator = () => {
               )}
             </div>
           </div>
-          </div>
+        </div>
         </div>
 
         {/* Filtro mesi se ci sono dati */}
@@ -414,13 +485,18 @@ const TassaSoggiornoCalculator = () => {
         />
 
 
-        <GuidaGECOS 
-          isOpen={showGuida} 
-          onClose={() => setShowGuida(false)} 
-          darkMode={darkMode} 
+        <GuidaGECOS
+          isOpen={showGuida}
+          onClose={() => setShowGuida(false)}
+          darkMode={darkMode}
         />
+        </div>
       </div>
     </div>
+          </PrivateRoute>
+        }
+      />
+    </Routes>
   );
 };
 

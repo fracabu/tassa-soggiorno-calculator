@@ -151,20 +151,24 @@ const useBookingProcessor = (comuneSelezionato = 'Roma') => {
 
   const detectCsvFormat = (data) => {
     if (data.length === 0) return 'unknown';
-    
+
     const firstRow = data[0];
     const headers = Object.keys(firstRow).map(h => h.toLowerCase());
-    
-    // Controlla se è Airbnb
-    if (headers.includes('codice di conferma') || headers.includes('nome dell\'ospite') || headers.includes('n. di adulti')) {
+
+    // Controlla se è Airbnb (supporta sia formato vecchio che nuovo)
+    if (headers.includes('codice di conferma') ||
+        headers.includes('ospite') ||
+        headers.includes('nome dell\'ospite') ||
+        headers.includes('n. di adulti') ||
+        (headers.includes('tipo') && headers.includes('notti'))) {
       return 'airbnb';
     }
-    
+
     // Controlla se è Booking.com
     if (headers.includes('booker country') || headers.includes('prenotato da') || headers.includes('nome ospite(i)')) {
       return 'booking';
     }
-    
+
     return 'generic';
   };
 
@@ -179,31 +183,39 @@ const useBookingProcessor = (comuneSelezionato = 'Roma') => {
   };
 
   const mapAirbnbData = (data) => {
-    return data.map((row, index) => {
-      const adulti = parseInt(row['N. di adulti'] || row['N di adulti'] || 1);
-      const bambini = parseInt(row['N. di bambini'] || row['N di bambini'] || 0);
-      const neonati = parseInt(row['N. di neonati'] || row['N di neonati'] || 0);
-      
-      // In Airbnb, assumiamo che i neonati (0-2 anni) siano sempre esenti
-      // e i bambini (3-12 anni) possano essere esenti se < 10 anni
-      const ospiti = adulti + bambini + neonati;
-      
+    // Filtra solo le righe di tipo "Prenotazione", escludendo ritenute fiscali e altri tipi
+    const bookingsOnly = data.filter(row => {
+      const tipo = (row['Tipo'] || '').toLowerCase();
+      return !tipo || tipo.includes('prenotazione') || tipo.includes('booking');
+    });
+
+    return bookingsOnly.map((row, index) => {
+      // Supporta sia il formato vecchio (con N. di adulti) che il nuovo (senza ospiti specificati)
+      const adulti = parseInt(row['N. di adulti'] || row['N di adulti'] || row['Adulti'] || 1);
+      const bambini = parseInt(row['N. di bambini'] || row['N di bambini'] || row['Bambini'] || 0);
+      const neonati = parseInt(row['N. di neonati'] || row['N di neonati'] || row['Neonati'] || 0);
+
+      // Nel nuovo formato, se non ci sono dati sugli ospiti, assumiamo 2 adulti come default
+      const hasGuestInfo = row['N. di adulti'] || row['Adulti'];
+      const ospiti = hasGuestInfo ? (adulti + bambini + neonati) : 2;
+
       // Mappiamo lo stato Airbnb
       let stato = 'OK';
       const statoAirbnb = (row['Stato'] || row['Status'] || '').toLowerCase();
       if (statoAirbnb.includes('cancellat') || statoAirbnb.includes('cancel')) {
         stato = 'Cancellata';
       }
-      
+
       return {
-        nome: row['Nome dell\'ospite'] || row['Guest Name'] || `Ospite ${index + 1}`,
+        nome: row['Ospite'] || row['Nome dell\'ospite'] || row['Guest Name'] || `Ospite ${index + 1}`,
         ospiti: ospiti,
         bambini: bambini + neonati, // Contiamo tutti i minori
-        etaBambini: [], // Airbnb non fornisce età specifiche, assumiamo tutti esenti
+        etaBambini: [], // Airbnb non fornisce età specifiche nel CSV standard
         arrivo: formatAirbnbDate(row['Data di inizio'] || row['Check-in'] || ''),
         partenza: formatAirbnbDate(row['Data di fine'] || row['Check-out'] || ''),
         stato: stato,
-        paese: 'IT' // Airbnb non fornisce sempre il paese, assumiamo Italia
+        paese: row['Paese'] || row['Country'] || 'IT', // Airbnb non sempre fornisce il paese
+        fonte: 'Airbnb' // Aggiungiamo un campo per identificare la fonte
       };
     });
   };
@@ -213,25 +225,26 @@ const useBookingProcessor = (comuneSelezionato = 'Roma') => {
       nome: row.Nome || row['Nome ospite'] || row['Guest Name'] || `Ospite ${index + 1}`,
       ospiti: parseInt(row.Ospiti || row['Numero Ospiti'] || row['Total Guests'] || row.Persone || 1),
       bambini: parseInt(row.Bambini || row.Children || 0),
-      etaBambini: row['Età Bambini'] ? 
+      etaBambini: row['Età Bambini'] ?
         row['Età Bambini'].split(',').map(Number) : [],
       arrivo: row.Arrivo || row.Checkin || row['Check-in'] || '',
       partenza: row.Partenza || row.Checkout || row['Check-out'] || '',
       stato: mapStatus(row.Stato || row.Status || 'OK'),
-      paese: row['Booker country'] || row.Paese || row.Country || 'unknown'
+      paese: row['Booker country'] || row.Paese || row.Country || 'unknown',
+      fonte: 'Booking.com' // Identifica la fonte
     }));
   };
 
   const formatAirbnbDate = (dateStr) => {
     if (!dateStr) return new Date().toISOString().split('T')[0];
-    
-    // Airbnb usa formato DD/MM/YYYY
+
+    // Airbnb usa formato MM/DD/YYYY (formato americano)
     const parts = dateStr.split('/');
     if (parts.length === 3) {
-      const [day, month, year] = parts;
+      const [month, day, year] = parts;
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
-    
+
     return dateStr;
   };
 
@@ -712,6 +725,15 @@ const useBookingProcessor = (comuneSelezionato = 'Roma') => {
     return { trimestri, totaliGenerali };
   };
 
+  const resetData = () => {
+    setPrenotazioni([]);
+    setResults(null);
+    setError('');
+    setFiltroMese('');
+    setDatiMensili(null);
+    setCurrentPage(1);
+  };
+
   return {
     prenotazioni,
     results,
@@ -732,7 +754,8 @@ const useBookingProcessor = (comuneSelezionato = 'Roma') => {
     handleFileUpload,
     exportResultsCSV,
     exportResultsPDF,
-    getCountryName
+    getCountryName,
+    resetData
   };
 };
 
