@@ -1,6 +1,10 @@
 // API Service per comunicazione con backend
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
+// Debug: mostra quale URL viene usato
+console.log('🔗 API_BASE_URL:', API_BASE_URL);
+console.log('🔧 process.env.REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+
 // Helper per gestire errori
 const handleResponse = async (response) => {
   if (!response.ok) {
