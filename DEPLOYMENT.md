@@ -6,6 +6,16 @@ Questa applicazione è composta da:
 - **Frontend**: React SPA (Single Page Application)
 - **Backend**: Node.js/Express API con SQLite database
 
+## 🚀 Quick Start: Frontend Vercel + Backend Render
+
+**Setup più veloce (5 minuti):**
+
+1. **Frontend su Vercel:** Già fatto ✅
+2. **Backend su Render:** Vedi `RENDER_QUICKSTART.md` per guida rapida
+3. **Guida dettagliata:** Vedi `DEPLOY_RENDER.md` per troubleshooting e opzioni avanzate
+
+---
+
 ## Opzioni di Deployment
 
 ### 1️⃣ DEPLOYMENT COMPLETO (Raccomandato)
@@ -13,29 +23,34 @@ Questa applicazione è composta da:
 #### **Render.com** (Full-Stack - GRATIS)
 
 **Backend:**
+
+🎯 **METODO VELOCE:** Usa `RENDER_QUICKSTART.md` (5 minuti)
+
+📖 **METODO DETTAGLIATO:** Usa `DEPLOY_RENDER.md` (guida completa)
+
+**TL;DR:**
 1. Vai su [render.com](https://render.com) e crea un account
 2. Crea un nuovo **Web Service**
-3. Connetti il repository GitHub
-4. Configurazione:
+3. Configurazione:
    - **Root Directory**: `server`
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
-   - **Environment**: Node
+   - **Region**: Frankfurt (più vicino all'Italia)
 
-5. Aggiungi le variabili d'ambiente:
-   ```
-   JWT_SECRET=<genera-una-stringa-casuale-lunga>
-   ADMIN_EMAILS=tua-email@example.com
-   NODE_ENV=production
-   FRONTEND_URL=<url-del-frontend>
-   ```
-
-   Per generare JWT_SECRET sicuro:
+4. Aggiungi variabili d'ambiente:
    ```bash
-   node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+   NODE_ENV=production
+   JWT_SECRET=<genera-con-script>
+   ADMIN_EMAILS=tua-email@example.com
+   FRONTEND_URL=https://tuo-app.vercel.app
    ```
 
-6. Deploy! L'URL sarà tipo: `https://tassa-soggiorno-api.onrender.com`
+   Genera JWT_SECRET sicuro:
+   ```bash
+   cd server && npm run generate-secret
+   ```
+
+5. Deploy! L'URL sarà tipo: `https://tassa-soggiorno-api.onrender.com`
 
 **Frontend:**
 1. Crea un nuovo **Static Site** su Render

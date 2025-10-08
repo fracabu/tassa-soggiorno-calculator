@@ -1,0 +1,36 @@
+# Configurazione Render per deploy automatico
+# https://render.com/docs/blueprint-spec
+
+services:
+  # Backend API
+  - type: web
+    name: tassa-soggiorno-api
+    env: node
+    region: frankfurt  # Più vicino all'Italia
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: JWT_SECRET
+        generateValue: true  # Render genera automaticamente un valore sicuro
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false  # Da configurare manualmente nella dashboard
+      - key: FRONTEND_URL
+        sync: false  # URL del frontend Vercel
+      # Email (opzionale)
+      - key: EMAIL_SERVICE
+        value: gmail
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+    healthCheckPath: /api/health
+    autoDeploy: true

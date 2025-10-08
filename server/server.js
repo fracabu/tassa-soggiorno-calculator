@@ -12,6 +12,14 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// SICUREZZA: Validazione JWT_SECRET in produzione
+if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)) {
+  console.error('❌ ERRORE CRITICO: JWT_SECRET non configurato o troppo corto in produzione!');
+  console.error('💡 Genera un secret sicuro con: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"');
+  process.exit(1);
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
