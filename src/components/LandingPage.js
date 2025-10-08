@@ -13,6 +13,7 @@ import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 import CookiePolicy from './CookiePolicy';
 import CookieBanner from './CookieBanner';
+import { register } from '../services/api';
 
 const LandingPage = ({ onRegisterSuccess, darkMode }) => {
   const [formData, setFormData] = useState({
@@ -31,30 +32,17 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3001/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const data = await register(formData);
 
-      const data = await response.json();
+      setSuccess(true);
+      // Token e user già salvati da api.js
 
-      if (response.ok) {
-        setSuccess(true);
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-
-        // Reindirizza all'app dopo 1.5 secondi
-        setTimeout(() => {
-          onRegisterSuccess(data);
-        }, 1500);
-      } else {
-        setError(data.error || 'Errore durante la registrazione');
-      }
+      // Reindirizza all'app dopo 1.5 secondi
+      setTimeout(() => {
+        onRegisterSuccess(data);
+      }, 1500);
     } catch (err) {
-      setError('Errore di connessione al server');
+      setError(err.message || 'Errore durante la registrazione');
       console.error(err);
     } finally {
       setLoading(false);
