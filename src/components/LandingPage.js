@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   BuildingOffice2Icon,
   ShieldCheckIcon,
@@ -25,6 +26,34 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  // Varianti animazioni
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 60 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.8 }
+    }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,18 +147,33 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
       }`}>
         <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
+          <motion.div
+            className="text-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={staggerContainer}
+          >
+            <motion.h1
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight"
+              variants={fadeInUp}
+            >
               Calcolo Tassa di Soggiorno
               <br />
               <span className="text-blue-200">Automatico e Veloce</span>
-            </h1>
+            </motion.h1>
 
-            <p className="text-lg sm:text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            <motion.p
+              className="text-lg sm:text-xl text-blue-100 mb-8 max-w-2xl mx-auto"
+              variants={fadeInUp}
+            >
               Per hotel, B&B e strutture ricettive italiane
-            </p>
+            </motion.p>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
+            <motion.div
+              className="flex flex-wrap items-center justify-center gap-4 mb-10"
+              variants={fadeInUp}
+            >
               <div className="flex items-center space-x-2 text-white">
                 <CheckCircleIcon className="w-5 h-5 text-green-300" />
                 <span className="text-sm font-medium">100% Gratuito</span>
@@ -142,19 +186,22 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
                 <CheckCircleIcon className="w-5 h-5 text-green-300" />
                 <span className="text-sm font-medium">Privacy Garantita</span>
               </div>
-            </div>
+            </motion.div>
 
-            <button
+            <motion.button
               onClick={(e) => {
                 e.preventDefault();
                 document.getElementById('register-section')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="inline-flex items-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold text-lg hover:bg-gray-50 transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105"
+              variants={fadeInUp}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               Prova Ora
               <ArrowRightIcon className="w-5 h-5 ml-2" />
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
 
         {/* Decorative elements */}
@@ -165,7 +212,13 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
       {/* Come Funziona */}
       <section className={`min-h-screen flex items-center py-20 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeInUp}
+          >
             <h2 className={`text-3xl sm:text-4xl font-bold mb-4 ${
               darkMode ? 'text-white' : 'text-gray-900'
             }`}>
@@ -174,13 +227,22 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
             <p className={`text-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               3 semplici passaggi per calcolare la tassa di soggiorno
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <motion.div
+            className="grid md:grid-cols-3 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={staggerContainer}
+          >
             {/* Step 1 */}
-            <div className={`relative p-8 rounded-2xl ${
-              darkMode ? 'bg-gray-700' : 'bg-gray-50'
-            } hover:shadow-xl transition-shadow`}>
+            <motion.div
+              className={`relative p-8 rounded-2xl ${
+                darkMode ? 'bg-gray-700' : 'bg-gray-50'
+              } hover:shadow-xl transition-shadow`}
+              variants={fadeInUp}
+            >
               <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-xl mb-6">
                 <BuildingOffice2Icon className="w-8 h-8 text-white" />
               </div>
@@ -195,12 +257,15 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
               <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
                 Scegli il tuo comune tra tutti quelli italiani. Le regole e tariffe vengono caricate automaticamente.
               </p>
-            </div>
+            </motion.div>
 
             {/* Step 2 */}
-            <div className={`relative p-8 rounded-2xl ${
-              darkMode ? 'bg-gray-700' : 'bg-gray-50'
-            } hover:shadow-xl transition-shadow`}>
+            <motion.div
+              className={`relative p-8 rounded-2xl ${
+                darkMode ? 'bg-gray-700' : 'bg-gray-50'
+              } hover:shadow-xl transition-shadow`}
+              variants={fadeInUp}
+            >
               <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-xl mb-6">
                 <DocumentTextIcon className="w-8 h-8 text-white" />
               </div>
@@ -215,12 +280,15 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
               <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
                 Upload dei tuoi file Excel o CSV da Booking.com, Airbnb o altri portali. Tutto elaborato nel browser.
               </p>
-            </div>
+            </motion.div>
 
             {/* Step 3 */}
-            <div className={`relative p-8 rounded-2xl ${
-              darkMode ? 'bg-gray-700' : 'bg-gray-50'
-            } hover:shadow-xl transition-shadow`}>
+            <motion.div
+              className={`relative p-8 rounded-2xl ${
+                darkMode ? 'bg-gray-700' : 'bg-gray-50'
+              } hover:shadow-xl transition-shadow`}
+              variants={fadeInUp}
+            >
               <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-xl mb-6">
                 <ChartBarIcon className="w-8 h-8 text-white" />
               </div>
@@ -235,8 +303,8 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
               <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
                 Esporta i calcoli in CSV per la contabilità o PDF per l'archivio. Pronto per GECOS e altri portali.
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -288,7 +356,7 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
           </div>
         </div>
       </section>
-
+      
       {/* Registration Form */}
       <section id="register-section" className={`min-h-screen flex items-center ${
         darkMode ? 'bg-gray-800' : 'bg-white'
