@@ -238,69 +238,69 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
           >
             {/* Step 1 */}
             <motion.div
-              className={`relative p-8 rounded-2xl ${
+              className={`relative p-12 rounded-2xl overflow-hidden min-h-[280px] flex flex-col ${
                 darkMode ? 'bg-gray-700' : 'bg-gray-50'
               } hover:shadow-xl transition-shadow`}
               variants={fadeInUp}
             >
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-xl mb-6">
-                <BuildingOffice2Icon className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-xl mb-6 flex-shrink-0">
+                <BuildingOffice2Icon className="w-9 h-9 text-white" />
               </div>
-              <div className="absolute top-8 right-8 text-6xl font-bold text-indigo-600/10">
+              <div className="absolute top-8 right-8 text-4xl font-bold text-indigo-600/10">
                 01
               </div>
-              <h3 className={`text-xl font-bold mb-3 ${
+              <h3 className={`text-xl font-bold mb-4 ${
                 darkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 Seleziona il Comune
               </h3>
-              <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed text-sm`}>
                 Scegli il tuo comune tra tutti quelli italiani. Le regole e tariffe vengono caricate automaticamente.
               </p>
             </motion.div>
 
             {/* Step 2 */}
             <motion.div
-              className={`relative p-8 rounded-2xl ${
+              className={`relative p-12 rounded-2xl overflow-hidden min-h-[280px] flex flex-col ${
                 darkMode ? 'bg-gray-700' : 'bg-gray-50'
               } hover:shadow-xl transition-shadow`}
               variants={fadeInUp}
             >
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-xl mb-6">
-                <DocumentTextIcon className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-xl mb-6 flex-shrink-0">
+                <DocumentTextIcon className="w-9 h-9 text-white" />
               </div>
-              <div className="absolute top-8 right-8 text-6xl font-bold text-indigo-600/10">
+              <div className="absolute top-8 right-8 text-4xl font-bold text-indigo-600/10">
                 02
               </div>
-              <h3 className={`text-xl font-bold mb-3 ${
+              <h3 className={`text-xl font-bold mb-4 ${
                 darkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 Carica il File
               </h3>
-              <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed text-sm`}>
                 Upload dei tuoi file Excel o CSV da Booking.com, Airbnb o altri portali. Tutto elaborato nel browser.
               </p>
             </motion.div>
 
             {/* Step 3 */}
             <motion.div
-              className={`relative p-8 rounded-2xl ${
+              className={`relative p-12 rounded-2xl overflow-hidden min-h-[280px] flex flex-col ${
                 darkMode ? 'bg-gray-700' : 'bg-gray-50'
               } hover:shadow-xl transition-shadow`}
               variants={fadeInUp}
             >
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-xl mb-6">
-                <ChartBarIcon className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-xl mb-6 flex-shrink-0">
+                <ChartBarIcon className="w-9 h-9 text-white" />
               </div>
-              <div className="absolute top-8 right-8 text-6xl font-bold text-indigo-600/10">
+              <div className="absolute top-8 right-8 text-4xl font-bold text-indigo-600/10">
                 03
               </div>
-              <h3 className={`text-xl font-bold mb-3 ${
+              <h3 className={`text-xl font-bold mb-4 ${
                 darkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 Scarica i Report
               </h3>
-              <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed text-sm`}>
                 Esporta i calcoli in CSV per la contabilità o PDF per l'archivio. Pronto per GECOS e altri portali.
               </p>
             </motion.div>

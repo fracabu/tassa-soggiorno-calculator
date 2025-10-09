@@ -177,14 +177,14 @@ const TassaSoggiornoCalculator = () => {
           <div className={`mb-4 sm:mb-6 overflow-x-hidden ${
             !prenotazioni.length ? 'flex items-center justify-center min-h-[calc(100vh-6rem)]' : ''
           }`}>
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full ${
-              !prenotazioni.length ? 'max-w-6xl' : ''
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full max-w-7xl mx-auto ${
+              !prenotazioni.length ? '' : ''
             }`}>
           {/* Step 1: Configurazione */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } rounded-lg border p-4 sm:p-6 w-full flex flex-col overflow-x-hidden ${
-            !prenotazioni.length ? 'min-h-[280px] sm:aspect-square' : 'min-h-[200px]'
+          } rounded-lg border p-6 sm:p-8 w-full flex flex-col overflow-hidden ${
+            !prenotazioni.length ? 'min-h-[400px]' : 'min-h-[200px]'
           }`}>
             <div className="text-center mb-4">
               <span className={`inline-flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold mb-2 ${
@@ -291,8 +291,8 @@ const TassaSoggiornoCalculator = () => {
           {/* Step 2: Upload File */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } rounded-lg border p-4 sm:p-6 w-full flex flex-col overflow-hidden ${
-            !prenotazioni.length ? 'min-h-[280px] sm:aspect-square' : 'min-h-[200px]'
+          } rounded-lg border p-6 sm:p-8 w-full flex flex-col overflow-hidden ${
+            !prenotazioni.length ? 'min-h-[400px]' : 'min-h-[200px]'
           }`}>
             <div className="text-center mb-4">
               <span className={`inline-flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold mb-2 ${
@@ -345,8 +345,8 @@ const TassaSoggiornoCalculator = () => {
           {/* Step 3: Risultati */}
           <div className={`${
             darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } rounded-lg border p-4 sm:p-6 w-full flex flex-col overflow-x-hidden ${
-            !prenotazioni.length ? 'min-h-[280px] sm:aspect-square md:col-span-2 lg:col-span-1' : 'min-h-[200px]'
+          } rounded-lg border p-6 sm:p-8 w-full flex flex-col overflow-hidden ${
+            !prenotazioni.length ? 'min-h-[400px] md:col-span-2 lg:col-span-1' : 'min-h-[200px]'
           }`}>
             <div className="text-center mb-4">
               <span className={`inline-flex w-8 h-8 rounded-full items-center justify-center text-sm font-bold mb-2 ${
