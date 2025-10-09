@@ -7,7 +7,8 @@ import {
   XMarkIcon,
   CheckCircleIcon,
   ChartBarIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import { getAllUsers, updateUser, deleteUser, getAdminStats } from '../services/api';
 
@@ -96,6 +97,44 @@ const AdminPage = ({ darkMode }) => {
     } catch (err) {
       setError(err.message || 'Errore durante l\'eliminazione');
     }
+  };
+
+  const handleExportCSV = () => {
+    // Prepara i dati CSV
+    const headers = ['ID', 'Nome', 'Cognome', 'Email', 'Azienda', 'Telefono', 'Data Registrazione', 'Ultimo Login', 'Stato'];
+    const rows = users.map(user => [
+      user.id,
+      user.nome || '',
+      user.cognome || '',
+      user.email,
+      user.azienda || '',
+      user.telefono || '',
+      new Date(user.created_at).toLocaleDateString('it-IT'),
+      user.last_login ? new Date(user.last_login).toLocaleDateString('it-IT') : 'Mai',
+      user.is_active ? 'Attivo' : 'Disattivo'
+    ]);
+
+    // Costruisci CSV
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Crea file e scarica
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `utenti_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setSuccess('CSV esportato con successo');
+    setTimeout(() => setSuccess(''), 3000);
   };
 
   if (loading) {
@@ -224,10 +263,17 @@ const AdminPage = ({ darkMode }) => {
 
         {/* Tabella Utenti */}
         <div className={`rounded-lg shadow overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-          <div className="px-6 py-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}">
+          <div className={`px-6 py-4 border-b flex justify-between items-center ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               Gestione Utenti ({users.length})
             </h2>
+            <button
+              onClick={handleExportCSV}
+              className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+            >
+              <ArrowDownTrayIcon className="w-5 h-5 mr-2" />
+              Esporta CSV
+            </button>
           </div>
 
           <div className="overflow-x-auto">
