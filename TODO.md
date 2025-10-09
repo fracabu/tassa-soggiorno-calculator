@@ -1,3 +1,180 @@
+# TODO - TourTax App
+
+## 🔴 PRIORITÀ ALTA - Verificare Persistenza Database Railway
+
+**Problema**: Utente registrato su Railway non riconosciuto (401)
+**Da fare domani**:
+- [ ] Testare login con utente esistente
+- [ ] Se 401 persiste, verificare:
+  - [ ] Railway database effettivamente persistente
+  - [ ] JWT_SECRET coerente tra deploy
+  - [ ] Logs Railway per errori database
+- [ ] Considerare upgrade Railway plan o switch a PostgreSQL
+
+---
+
+## 🎨 MIGLIORAMENTI UX/UI
+
+### 1. **Specifiche File Upload**
+**Priorità**: Alta ⭐⭐⭐
+
+Attualmente dice solo "Excel/CSV da Booking o Airbnb" - troppo generico!
+
+**Migliorare con**:
+```
+Formati supportati:
+✅ CSV Prenotazioni Booking.com
+✅ CSV Pending Airbnb
+✅ PDF Report Booking.com
+✅ Excel personalizzato (.xlsx/.xls)
+
+Dove trovare i file:
+• Booking.com: Extranet → Prenotazioni → Esporta CSV
+• Airbnb: Dashboard Host → Prenotazioni → Scarica CSV pending
+```
+
+**File da modificare**:
+- `src/components/FileUpload.js` - aggiungere tooltip/dropdown con info
+- Aggiungere icone per ogni tipo di file
+- Mostrare esempi screenshot nella guida
+
+---
+
+### 2. **Validazione File più chiara**
+**Priorità**: Media ⭐⭐
+
+**Problema attuale**: Se il file non ha le colonne giuste, errore generico
+
+**Migliorare con**:
+- [ ] Mostrare preview prime righe file caricato
+- [ ] Suggerire mapping colonne se non riconosciute
+- [ ] Messaggio errore specifico: "Manca colonna 'Check-in', trovate: [elenco colonne]"
+- [ ] Pulsante "Vedi esempio file valido"
+
+---
+
+### 3. **Guida Interattiva File**
+**Priorità**: Media ⭐⭐
+
+**Aggiungere**:
+- [ ] Video/GIF animata che mostra come esportare da Booking
+- [ ] Video/GIF animata che mostra come esportare da Airbnb
+- [ ] Template file esempio scaricabile
+- [ ] Sezione FAQ "File non riconosciuto? Ecco perché..."
+
+---
+
+### 4. **Supporto PDF Booking.com**
+**Priorità**: Alta ⭐⭐⭐
+
+**Attualmente**: Solo Excel/CSV
+**Richiesto**: Anche PDF di Booking.com
+
+**Da implementare**:
+- [ ] Installare `pdf-parse` o `pdfjs-dist`
+- [ ] Parser per estrarre testo da PDF Booking
+- [ ] Regex per identificare pattern prenotazioni nel PDF
+- [ ] Mapping dati PDF → struttura booking interna
+- [ ] Test con vari formati PDF Booking
+
+**Libreria consigliata**: `pdf-parse`
+```bash
+npm install pdf-parse
+```
+
+---
+
+### 5. **Miglioramenti Tabella Risultati**
+**Priorità**: Bassa ⭐
+
+- [ ] Export Excel (non solo CSV/PDF)
+- [ ] Filtri avanzati (per paese, per periodo, per importo)
+- [ ] Ordinamento colonne
+- [ ] Evidenziare righe con esenzioni manuali
+
+---
+
+### 6. **Dashboard Analytics**
+**Priorità**: Bassa ⭐
+
+- [ ] Grafico trend prenotazioni per mese
+- [ ] Top 5 paesi ospiti
+- [ ] Confronto anno precedente (se disponibile)
+- [ ] Statistiche occupazione media
+
+---
+
+### 7. **Salvataggio Calcoli (Backend)**
+**Priorità**: Media ⭐⭐
+
+**Già presente endpoint** (`POST /api/calculations`) ma non usato!
+
+**Da fare**:
+- [ ] Aggiungere pulsante "Salva Calcolo" nell'app
+- [ ] Mostrare storico calcoli salvati
+- [ ] Permettere riapertura calcolo salvato
+- [ ] Export tutti i calcoli del mese
+
+---
+
+### 8. **Notifiche/Promemoria**
+**Priorità**: Bassa ⭐
+
+- [ ] Reminder automatico scadenze GECOS comunale
+- [ ] Email mensile con riassunto calcoli (opzionale)
+
+---
+
+### 9. **Multi-lingua**
+**Priorità**: Bassa ⭐
+
+- [ ] Inglese (per strutture turistiche internazionali)
+- [ ] Mantenere italiano come default
+
+---
+
+### 10. **Mobile UX**
+**Priorità**: Media ⭐⭐
+
+- [ ] Testare upload file da mobile
+- [ ] Ottimizzare tabelle per scroll orizzontale mobile
+- [ ] Touch-friendly controls
+
+---
+
+## 🐛 BUG DA FIXARE
+
+- [ ] **Scrollbar orizzontale** - verificare se sparita con ultime modifiche
+- [ ] **Badge numeri card** - verificare che stiano dentro card
+- [ ] **Dark mode persistenza** - testare su più browser
+
+---
+
+## 🔧 REFACTORING TECNICO
+
+### Code Quality
+- [ ] Aggiungere PropTypes o TypeScript
+- [ ] Separare meglio business logic da UI
+- [ ] Test unitari per `useBookingProcessor.js`
+- [ ] E2E test con Playwright/Cypress
+
+### Performance
+- [ ] Code splitting React.lazy()
+- [ ] Ottimizzare bundle size (tree shaking)
+- [ ] Service Worker per offline support
+
+---
+
+## 📊 PRIORITÀ RACCOMANDATA (Domani)
+
+1. ✅ **Verificare database Railway** (critico)
+2. ⭐⭐⭐ **Migliorare specifiche file upload**
+3. ⭐⭐⭐ **Supporto PDF Booking.com**
+4. ⭐⭐ **Validazione file più chiara**
+5. ⭐⭐ **Guida interattiva file**
+
+---
+
 # TODO - Fix Database Persistenza
 
 ## 🔴 PROBLEMA ATTUALE
