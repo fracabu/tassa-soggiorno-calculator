@@ -23,16 +23,16 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-3">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-lg ${
-              darkMode ? 'bg-blue-600' : 'bg-blue-500'
-            }`}>
-              <BuildingOffice2Icon className="w-6 h-6 text-white" />
-            </div>
-            <span className={`text-lg font-bold ${
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+            <img
+              src="/logo.svg"
+              alt="Tassa Soggiorno Logo"
+              className="w-10 h-10 rounded-lg"
+            />
+            <span className={`text-xl sm:text-2xl font-extrabold tracking-tight ${
               darkMode ? 'text-white' : 'text-gray-900'
-            }`}>
-              Calcolatore Tassa di Soggiorno
+            }`} style={{ fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.02em' }}>
+              TourTax
             </span>
           </div>
 

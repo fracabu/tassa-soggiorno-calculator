@@ -68,15 +68,15 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <div className={`p-2 rounded-lg ${
-                darkMode ? 'bg-blue-600' : 'bg-blue-500'
-              }`}>
-                <BuildingOffice2Icon className="w-6 h-6 text-white" />
-              </div>
-              <span className={`text-lg font-bold ${
+              <img
+                src="/logo.svg"
+                alt="TourTax Logo"
+                className="w-10 h-10 rounded-lg"
+              />
+              <span className={`text-xl sm:text-2xl font-extrabold tracking-tight ${
                 darkMode ? 'text-white' : 'text-gray-900'
-              }`}>
-                Tassa Soggiorno
+              }`} style={{ fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.02em' }}>
+                TourTax
               </span>
             </Link>
 
@@ -111,31 +111,25 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
       </nav>
 
       {/* Hero Section */}
-      <header className={`relative overflow-hidden mt-16 ${
+      <header className={`relative overflow-hidden h-screen flex items-center ${
         darkMode
           ? 'bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900'
           : 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600'
       }`}>
         <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm font-semibold mb-6 border border-white/20">
-              <SparklesIcon className="w-4 h-4 mr-2" />
-              <span>Gratuito • Sicuro • Professionale</span>
-            </div>
-
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-              Gestisci la Tassa di Soggiorno
+              Calcolo Tassa di Soggiorno
               <br />
-              <span className="text-blue-200">in Modo Automatico</span>
+              <span className="text-blue-200">Automatico e Veloce</span>
             </h1>
 
-            <p className="text-xl sm:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Il tool professionale per hotel, B&B e strutture ricettive.
-              Calcola, analizza ed esporta in pochi click.
+            <p className="text-lg sm:text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              Per hotel, B&B e strutture ricettive italiane
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
               <div className="flex items-center space-x-2 text-white">
                 <CheckCircleIcon className="w-5 h-5 text-green-300" />
                 <span className="text-sm font-medium">100% Gratuito</span>
@@ -157,7 +151,7 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
               }}
               className="inline-flex items-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold text-lg hover:bg-gray-50 transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105"
             >
-              Inizia Gratis Ora
+              Prova Ora
               <ArrowRightIcon className="w-5 h-5 ml-2" />
             </button>
           </div>
@@ -169,7 +163,7 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
       </header>
 
       {/* Come Funziona */}
-      <section className={`py-20 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <section className={`min-h-screen flex items-center py-20 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className={`text-3xl sm:text-4xl font-bold mb-4 ${
@@ -247,7 +241,7 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
       </section>
 
       {/* Features */}
-      <section className={`py-20 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <section className={`min-h-screen flex items-center py-20 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="flex items-start space-x-4">
