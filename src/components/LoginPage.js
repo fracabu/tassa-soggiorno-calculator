@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
 import { login, forgotPassword } from '../services/api';
 
 const LoginPage = ({ onLoginSuccess, darkMode }) => {
@@ -55,20 +54,27 @@ const LoginPage = ({ onLoginSuccess, darkMode }) => {
       <div className="w-full max-w-md">
         {/* Logo e Titolo */}
         <div className="text-center mb-8">
-          <div className={`inline-flex items-center justify-center w-16 h-16 rounded-xl mb-4 ${
-            darkMode ? 'bg-blue-600' : 'bg-blue-500'
-          }`}>
-            <BuildingOffice2Icon className="w-10 h-10 text-white" />
-          </div>
+          <Link to="/" className="inline-flex items-center space-x-2 mb-6 hover:opacity-80 transition-opacity">
+            <img
+              src="/logo.svg"
+              alt="TourTax Logo"
+              className="w-12 h-12 rounded-lg"
+            />
+            <span className={`text-2xl font-extrabold tracking-tight ${
+              darkMode ? 'text-white' : 'text-gray-900'
+            }`} style={{ fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.02em' }}>
+              TourTax
+            </span>
+          </Link>
           <h1 className={`text-2xl font-bold ${
             darkMode ? 'text-white' : 'text-gray-900'
           }`}>
-            Accedi al Calcolatore
+            Accedi al tuo Account
           </h1>
           <p className={`mt-2 ${
             darkMode ? 'text-gray-400' : 'text-gray-600'
           }`}>
-            Tassa di Soggiorno - Comuni Italiani
+            Calcolo Tassa di Soggiorno
           </p>
         </div>
 

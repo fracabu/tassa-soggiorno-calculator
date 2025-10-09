@@ -14,7 +14,7 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
 
   // Verifica se l'utente è admin (controllando email dal localStorage)
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const adminEmails = ['fracabu@gmail.com', 'admin@tassasoggiorno.it'];
+  const adminEmails = ['fracabu@gmail.com', 'admin@tassasoggiorno.it', 'admin@test.it'];
   const isAdmin = user.email && adminEmails.includes(user.email);
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 ${

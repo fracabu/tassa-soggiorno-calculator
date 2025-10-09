@@ -13,6 +13,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy per Render/produzione (necessario per rate limiter)
+app.set('trust proxy', 1);
+
 // SICUREZZA: Validazione JWT_SECRET in produzione
 if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)) {
   console.error('❌ ERRORE CRITICO: JWT_SECRET non configurato o troppo corto in produzione!');
