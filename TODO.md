@@ -1,19 +1,25 @@
-# TODO - TourTax App
+# TODO - Taxly App
 
-## 🔴 PRIORITÀ ALTA - Verificare Persistenza Database Railway
+## ✅ COMPLETATI OGGI (10 Ottobre 2025)
 
-**Problema**: Utente registrato su Railway non riconosciuto (401)
-**Da fare domani**:
-- [ ] Testare login con utente esistente
-- [ ] Se 401 persiste, verificare:
-  - [ ] Railway database effettivamente persistente
-  - [ ] JWT_SECRET coerente tra deploy
-  - [ ] Logs Railway per errori database
-- [ ] Considerare upgrade Railway plan o switch a PostgreSQL
+### Backend & Database
+- ✅ **Migrazione PostgreSQL Railway** - Database persistente funzionante
+- ✅ **Database adapter** - Supporto SQLite (dev) + PostgreSQL (prod)
+- ✅ **Fix admin endpoints** - Convertiti tutti da callback a async/await
+- ✅ **Fix admin page 500 error** - Risolto problema con db.all()
+- ✅ **Rimozione campi inutili** - Rimossi azienda/telefono da DB e form
+- ✅ **Pulizia admin panel** - Rimossa card "Calcoli Totali" (non attiva)
+- ✅ **Rimozione debug logs** - Rimossi console.log dalle API
+
+### Brand & Design
+- ✅ **Rebrand Taxly** - Cambio nome da TourTax a Taxly
+- ✅ **Nuovo logo minimale** - Edificio allargato, no cerchio, 5x5 finestre
+- ✅ **Font Poppins** - Sostituito Inter con Poppins (più moderno)
+- ✅ **Badge € ottimizzato** - Posizionato in alto a destra
 
 ---
 
-## 🎨 MIGLIORAMENTI UX/UI
+## 🔴 PRIORITÀ ALTA
 
 ### 1. **Specifiche File Upload**
 **Priorità**: Alta ⭐⭐⭐
@@ -25,7 +31,7 @@ Attualmente dice solo "Excel/CSV da Booking o Airbnb" - troppo generico!
 Formati supportati:
 ✅ CSV Prenotazioni Booking.com
 ✅ CSV Pending Airbnb
-✅ PDF Report Booking.com
+✅ PDF Report Booking.com (DA IMPLEMENTARE)
 ✅ Excel personalizzato (.xlsx/.xls)
 
 Dove trovare i file:
@@ -34,37 +40,13 @@ Dove trovare i file:
 ```
 
 **File da modificare**:
-- `src/components/FileUpload.js` - aggiungere tooltip/dropdown con info
-- Aggiungere icone per ogni tipo di file
-- Mostrare esempi screenshot nella guida
+- [ ] `src/components/FileUpload.js` - aggiungere tooltip/dropdown con info
+- [ ] Aggiungere icone per ogni tipo di file
+- [ ] Mostrare esempi screenshot nella guida
 
 ---
 
-### 2. **Validazione File più chiara**
-**Priorità**: Media ⭐⭐
-
-**Problema attuale**: Se il file non ha le colonne giuste, errore generico
-
-**Migliorare con**:
-- [ ] Mostrare preview prime righe file caricato
-- [ ] Suggerire mapping colonne se non riconosciute
-- [ ] Messaggio errore specifico: "Manca colonna 'Check-in', trovate: [elenco colonne]"
-- [ ] Pulsante "Vedi esempio file valido"
-
----
-
-### 3. **Guida Interattiva File**
-**Priorità**: Media ⭐⭐
-
-**Aggiungere**:
-- [ ] Video/GIF animata che mostra come esportare da Booking
-- [ ] Video/GIF animata che mostra come esportare da Airbnb
-- [ ] Template file esempio scaricabile
-- [ ] Sezione FAQ "File non riconosciuto? Ecco perché..."
-
----
-
-### 4. **Supporto PDF Booking.com**
+### 2. **Supporto PDF Booking.com**
 **Priorità**: Alta ⭐⭐⭐
 
 **Attualmente**: Solo Excel/CSV
@@ -81,6 +63,62 @@ Dove trovare i file:
 ```bash
 npm install pdf-parse
 ```
+
+---
+
+### 3. **Validazione File più chiara**
+**Priorità**: Media ⭐⭐
+
+**Problema attuale**: Se il file non ha le colonne giuste, errore generico
+
+**Migliorare con**:
+- [ ] Mostrare preview prime righe file caricato
+- [ ] Suggerire mapping colonne se non riconosciute
+- [ ] Messaggio errore specifico: "Manca colonna 'Check-in', trovate: [elenco colonne]"
+- [ ] Pulsante "Vedi esempio file valido"
+
+---
+
+## 🎨 MIGLIORAMENTI UX/UI
+
+### 4. **Visual Design & Immagini**
+**Priorità**: Alta ⭐⭐⭐
+
+**Rendere l'esperienza utente più "fica" con elementi visual**
+
+**Hero Section**:
+- [ ] Background image professionale (hotel/resort/turismo)
+- [ ] Gradient overlay per leggibilità testo
+- [ ] Animazioni subtle (parallax, fade-in)
+- [ ] Illustrazioni SVG custom (edifici, mappe Italia)
+
+**Sezioni Landing Page**:
+- [ ] Immagini per "Come Funziona" (screenshots app in uso)
+- [ ] Icone custom invece di Heroicons (più personalizzate)
+- [ ] Screenshot app nella sezione features
+- [ ] Testimonianze con foto utenti (mockup)
+
+**Immagini Consigliate**:
+- Hero: Vista aerea resort italiano al tramonto
+- Features: Dashboard screenshot con blur effect
+- Testimonials: Foto stock manager hotel italiani
+- Footer: Pattern geometrico sottile
+
+**Risorse**:
+- Unsplash API per immagini gratis
+- Illustrazioni: undraw.co, storyset.com
+- Pattern: heropatterns.com
+
+---
+
+### 5. **Guida Interattiva File**
+**Priorità**: Media ⭐⭐
+
+**Aggiungere**:
+- [ ] Video/GIF animata che mostra come esportare da Booking
+- [ ] Video/GIF animata che mostra come esportare da Airbnb
+- [ ] Template file esempio scaricabile
+- [ ] Sezione FAQ "File non riconosciuto? Ecco perché..."
 
 ---
 
@@ -114,26 +152,11 @@ npm install pdf-parse
 - [ ] Mostrare storico calcoli salvati
 - [ ] Permettere riapertura calcolo salvato
 - [ ] Export tutti i calcoli del mese
+- [ ] Riattivare card "Calcoli Totali" in admin panel
 
 ---
 
-### 8. **Notifiche/Promemoria**
-**Priorità**: Bassa ⭐
-
-- [ ] Reminder automatico scadenze GECOS comunale
-- [ ] Email mensile con riassunto calcoli (opzionale)
-
----
-
-### 9. **Multi-lingua**
-**Priorità**: Bassa ⭐
-
-- [ ] Inglese (per strutture turistiche internazionali)
-- [ ] Mantenere italiano come default
-
----
-
-### 10. **Mobile UX**
+### 8. **Mobile UX**
 **Priorità**: Media ⭐⭐
 
 - [ ] Testare upload file da mobile
@@ -142,11 +165,27 @@ npm install pdf-parse
 
 ---
 
-## 🐛 BUG DA FIXARE
+### 9. **Notifiche/Promemoria**
+**Priorità**: Bassa ⭐
+
+- [ ] Reminder automatico scadenze GECOS comunale
+- [ ] Email mensile con riassunto calcoli (opzionale)
+
+---
+
+### 10. **Multi-lingua**
+**Priorità**: Bassa ⭐
+
+- [ ] Inglese (per strutture turistiche internazionali)
+- [ ] Mantenere italiano come default
+
+---
+
+## 🐛 BUG DA VERIFICARE
 
 - [ ] **Scrollbar orizzontale** - verificare se sparita con ultime modifiche
-- [ ] **Badge numeri card** - verificare che stiano dentro card
 - [ ] **Dark mode persistenza** - testare su più browser
+- [ ] **Upload file mobile** - testare su iOS/Android
 
 ---
 
@@ -162,137 +201,30 @@ npm install pdf-parse
 - [ ] Code splitting React.lazy()
 - [ ] Ottimizzare bundle size (tree shaking)
 - [ ] Service Worker per offline support
+- [ ] Lazy load delle immagini
 
 ---
 
-## 📊 PRIORITÀ RACCOMANDATA (Domani)
+## 📊 PRIORITÀ RACCOMANDATA (Prossimi passi)
 
-1. ✅ **Verificare database Railway** (critico)
-2. ⭐⭐⭐ **Migliorare specifiche file upload**
-3. ⭐⭐⭐ **Supporto PDF Booking.com**
-4. ⭐⭐ **Validazione file più chiara**
-5. ⭐⭐ **Guida interattiva file**
-
----
-
-# TODO - Fix Database Persistenza
-
-## 🔴 PROBLEMA ATTUALE
-Il database SQLite su Render Free Tier viene cancellato ad ogni restart del servizio.
-- ✅ Registrazione funziona
-- ❌ Al riavvio (dopo 15 min sleep) gli utenti vengono persi
-- ❌ Login fallisce perché il database è vuoto
+1. ⭐⭐⭐ **Visual Design & Immagini** (impatto WOW immediato!)
+2. ⭐⭐⭐ **Supporto PDF Booking.com** (richiesto spesso)
+3. ⭐⭐⭐ **Migliorare specifiche file upload** (UX critica)
+4. ⭐⭐ **Validazione file più chiara** (riduce errori utente)
+5. ⭐⭐ **Salvataggio calcoli** (feature già pronta backend)
+6. ⭐⭐ **Mobile UX testing** (molti utenti da mobile)
 
 ---
 
-## 🎯 SOLUZIONI POSSIBILI
+## 🚀 DEPLOYMENT
 
-### OPZIONE 1: Railway (CONSIGLIATA - Zero modifiche)
-**Costo**: Gratis (con $5 crediti mensili)
-**Effort**: ⭐ Basso
-**Modifiche codice**: Nessuna
+### Produzione Attuale
+- **Frontend**: Vercel (https://tassa-soggiorno-calculator.vercel.app)
+- **Backend**: Railway (PostgreSQL persistente)
+- **Database**: PostgreSQL Railway (Free tier)
 
-**Steps**:
-1. [ ] Vai su [railway.app](https://railway.app)
-2. [ ] "New Project" → "Deploy from GitHub repo"
-3. [ ] Seleziona repository
-4. [ ] Settings → Root Directory: `server`
-5. [ ] Settings → Start Command: `npm start`
-6. [ ] Variables → Aggiungi:
-   - `JWT_SECRET`
-   - `ADMIN_EMAILS`
-   - `NODE_ENV=production`
-   - `FRONTEND_URL` (URL Vercel)
-7. [ ] Copia URL generato da Railway
-8. [ ] Aggiorna `REACT_APP_API_URL` su Vercel con nuovo URL Railway
-
-**Pro**:
-- ✅ Zero modifiche al codice
-- ✅ Filesystem persistente (SQLite funziona)
-- ✅ Gratuito
-- ✅ Auto-deploy da GitHub
-
-**Contro**:
-- ❌ $5 crediti/mese (dovrebbe bastare)
-
----
-
-### OPZIONE 2: Render Starter ($7/mese)
-**Costo**: $7/mese
-**Effort**: ⭐ Basso
-**Modifiche codice**: Nessuna
-
-**Steps**:
-1. [ ] Vai su dashboard Render
-2. [ ] Upgrade servizio a "Starter Plan" ($7/mese)
-3. [ ] Fatto! Il filesystem diventa persistente
-
-**Pro**:
-- ✅ Zero modifiche al codice
-- ✅ Sempre attivo (no sleep)
-- ✅ 512 MB RAM
-
-**Contro**:
-- ❌ Costa $7/mese
-
----
-
-### OPZIONE 3: Turso SQLite Cloud (Gratis - Modifiche minime)
-**Costo**: Gratis
-**Effort**: ⭐⭐ Medio
-**Modifiche codice**: Minime (~10 righe)
-
-**Steps**:
-1. [ ] Installa Turso: `npm install -g @turso/cli`
-2. [ ] Login: `turso auth signup`
-3. [ ] Crea DB: `turso db create tassa-soggiorno`
-4. [ ] Ottieni URL: `turso db show tassa-soggiorno --url`
-5. [ ] Crea token: `turso db tokens create tassa-soggiorno`
-6. [ ] Installa SDK: `cd server && npm install @libsql/client`
-7. [ ] Modifica `server.js` per usare Turso invece di SQLite locale
-8. [ ] Aggiungi variabili su Render:
-   - `TURSO_DATABASE_URL`
-   - `TURSO_AUTH_TOKEN`
-
-**Pro**:
-- ✅ Gratuito
-- ✅ SQLite cloud (stesso DB)
-- ✅ Veloce
-
-**Contro**:
-- ❌ Richiede modifiche al codice
-
----
-
-### OPZIONE 4: PostgreSQL Render (Gratis - Refactor DB)
-**Costo**: Gratis
-**Effort**: ⭐⭐⭐ Alto
-**Modifiche codice**: Medie (refactor completo DB layer)
-
-**Steps**:
-1. [ ] Crea PostgreSQL database su Render
-2. [ ] Installa `pg`: `cd server && npm install pg`
-3. [ ] Crea `database.js` adapter per PostgreSQL/SQLite
-4. [ ] Refactor `server.js` per usare il nuovo adapter
-5. [ ] Converti query SQLite → PostgreSQL
-6. [ ] Test completo
-7. [ ] Deploy
-
-**Pro**:
-- ✅ Gratuito
-- ✅ Database "serio" (scalabile)
-- ✅ Standard industry
-
-**Contro**:
-- ❌ Richiede refactor significativo
-- ❌ Rischio di bug
-
----
-
-## 🏆 RACCOMANDAZIONE
-
-**Vai con Railway (Opzione 1)** → Zero modifiche, zero costi, funziona subito.
-
-Se preferisci tenere Render:
-- Budget disponibile → Opzione 2 (Render $7/mese)
-- Budget zero → Opzione 4 (PostgreSQL gratis ma più lavoro)
+### Note
+- ✅ Render cancellato (obsoleto)
+- ✅ Railway con PostgreSQL funzionante
+- ✅ Auto-deploy da GitHub su push
+- ✅ Environment variables configurate
