@@ -178,7 +178,7 @@ const AdminPage = ({ darkMode }) => {
       <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b sticky top-0 z-10`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={() => navigate('/app')}
                 className={`p-2 rounded-lg ${
@@ -187,8 +187,9 @@ const AdminPage = ({ darkMode }) => {
               >
                 <ArrowLeftIcon className="w-5 h-5" />
               </button>
-              <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Pannello Amministratore
+              <h1 className={`text-lg sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <span className="hidden sm:inline">Pannello Amministratore</span>
+                <span className="sm:hidden">Admin</span>
               </h1>
             </div>
           </div>
@@ -244,20 +245,150 @@ const AdminPage = ({ darkMode }) => {
 
         {/* Tabella Utenti */}
         <div className={`rounded-lg shadow overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-          <div className={`px-6 py-4 border-b flex justify-between items-center ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-            <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <div className={`px-4 sm:px-6 py-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+            <h2 className={`text-lg sm:text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               Gestione Utenti ({users.length})
             </h2>
             <button
               onClick={handleExportCSV}
-              className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+              className="inline-flex items-center px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium w-full sm:w-auto justify-center"
             >
               <ArrowDownTrayIcon className="w-5 h-5 mr-2" />
-              Esporta CSV
+              <span className="hidden sm:inline">Esporta CSV</span>
+              <span className="sm:hidden">Esporta</span>
             </button>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Card Layout */}
+          <div className="md:hidden divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}">
+            {users.map(user => (
+              <div key={user.id} className={`p-4 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                {editingUser === user.id ? (
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        ID: {user.id}
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleUpdate(user.id)}
+                          className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+                        >
+                          Salva
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className={`px-3 py-1 rounded text-sm ${
+                            darkMode ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-700'
+                          }`}
+                        >
+                          Annulla
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Nome
+                      </label>
+                      <input
+                        type="text"
+                        name="nome"
+                        value={formData.nome}
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 rounded border text-sm ${
+                          darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Cognome
+                      </label>
+                      <input
+                        type="text"
+                        name="cognome"
+                        value={formData.cognome}
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 rounded border text-sm ${
+                          darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 rounded border text-sm ${
+                          darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                        }`}
+                      />
+                    </div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="is_active"
+                        checked={formData.is_active}
+                        onChange={handleChange}
+                        className="mr-2"
+                      />
+                      <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Attivo
+                      </span>
+                    </label>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {user.nome} {user.cognome}
+                        </p>
+                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {user.email}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleEdit(user)}
+                          className="p-1 text-indigo-600 hover:text-indigo-900"
+                        >
+                          <PencilIcon className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(user.id, `${user.nome} ${user.cognome}`)}
+                          className="p-1 text-red-600 hover:text-red-900"
+                        >
+                          <TrashIcon className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+                        {new Date(user.created_at).toLocaleDateString('it-IT')}
+                      </span>
+                      {user.is_active ? (
+                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                          Attivo
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                          Disattivo
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}">
               <thead className={darkMode ? 'bg-gray-900' : 'bg-gray-50'}>
                 <tr>
