@@ -1,5 +1,4 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
@@ -8,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const { sendWelcomeEmail, sendResetPasswordEmail } = require('./config/email');
+const db = require('./database'); // Database adapter (SQLite + PostgreSQL)
 require('dotenv').config();
 
 const app = express();
@@ -57,77 +57,11 @@ const authLimiter = rateLimit({
   skipSuccessfulRequests: true
 });
 
-// Database setup
-const db = new sqlite3.Database('./database.sqlite', (err) => {
-  if (err) {
-    console.error('Errore connessione database:', err);
-  } else {
-    console.log('✅ Database SQLite connesso');
-    initDatabase();
-  }
+// Inizializza database (SQLite o PostgreSQL based on env)
+db.initDatabase().catch(err => {
+  console.error('❌ Fatal: Impossibile inizializzare database');
+  process.exit(1);
 });
-
-// Inizializza tabelle
-function initDatabase() {
-  // Tabella users
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      nome TEXT,
-      cognome TEXT,
-      azienda TEXT,
-      telefono TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      last_login DATETIME,
-      is_active BOOLEAN DEFAULT 1,
-      email_verified BOOLEAN DEFAULT 0,
-      reset_token TEXT,
-      reset_token_expires DATETIME
-    )
-  `, (err) => {
-    if (err) {
-      console.error('Errore creazione tabella users:', err);
-    } else {
-      console.log('✅ Tabella users pronta');
-    }
-  });
-
-  // Tabella login history
-  db.run(`
-    CREATE TABLE IF NOT EXISTS login_history (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
-      login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-      ip_address TEXT,
-      user_agent TEXT,
-      FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-  `);
-
-  // Tabella calcoli salvati
-  db.run(`
-    CREATE TABLE IF NOT EXISTS calculations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      comune TEXT NOT NULL,
-      file_name TEXT,
-      total_prenotazioni INTEGER,
-      total_notti INTEGER,
-      total_tassa REAL,
-      data JSON,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-  `, (err) => {
-    if (err) {
-      console.error('Errore creazione tabella calculations:', err);
-    } else {
-      console.log('✅ Tabella calculations pronta');
-    }
-  });
-}
 
 // Middleware autenticazione
 const authenticateToken = (req, res, next) => {
@@ -170,55 +104,41 @@ app.post('/api/register', authLimiter, [
 
   try {
     // Verifica se email esiste già
-    db.get('SELECT id FROM users WHERE email = ?', [email], async (err, row) => {
-      if (err) {
-        return res.status(500).json({ error: 'Errore database' });
+    const existingUser = await db.get('SELECT id FROM users WHERE email = ?', [email]);
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email già registrata' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Inserisci nuovo utente
+    const result = await db.run(
+      `INSERT INTO users (email, password, nome, cognome, azienda, telefono)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [email, hashedPassword, nome, cognome, azienda || null, telefono || null]
+    );
+
+    // Genera JWT
+    const token = jwt.sign(
+      { id: result.lastID, email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      message: 'Registrazione completata',
+      token,
+      user: {
+        id: result.lastID,
+        email,
+        nome,
+        cognome
       }
-
-      if (row) {
-        return res.status(400).json({ error: 'Email già registrata' });
-      }
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Inserisci nuovo utente
-      db.run(
-        `INSERT INTO users (email, password, nome, cognome, azienda, telefono)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [email, hashedPassword, nome, cognome, azienda || null, telefono || null],
-        function(err) {
-          if (err) {
-            return res.status(500).json({ error: 'Errore durante la registrazione' });
-          }
-
-          // Genera JWT
-          const token = jwt.sign(
-            { id: this.lastID, email },
-            JWT_SECRET,
-            { expiresIn: '7d' }
-          );
-
-          // Email disabilitata per ora
-          // const loginUrl = `${FRONTEND_URL}/app`;
-          // sendWelcomeEmail(email, nome, loginUrl).catch(err =>
-          //   console.error('Email benvenuto fallita:', err)
-          // );
-
-          res.status(201).json({
-            message: 'Registrazione completata',
-            token,
-            user: {
-              id: this.lastID,
-              email,
-              nome,
-              cognome
-            }
-          });
-        }
-      );
     });
   } catch (error) {
+    console.error('Errore registrazione:', error);
     res.status(500).json({ error: 'Errore server' });
   }
 });
@@ -235,10 +155,8 @@ app.post('/api/login', authLimiter, [
 
   const { email, password } = req.body;
 
-  db.get('SELECT * FROM users WHERE email = ? AND is_active = 1', [email], async (err, user) => {
-    if (err) {
-      return res.status(500).json({ error: 'Errore database' });
-    }
+  try {
+    const user = await db.get('SELECT * FROM users WHERE email = ? AND is_active = 1', [email]);
 
     if (!user) {
       return res.status(401).json({ error: 'Credenziali non valide' });
@@ -251,12 +169,12 @@ app.post('/api/login', authLimiter, [
     }
 
     // Aggiorna last_login
-    db.run('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?', [user.id]);
+    await db.run('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?', [user.id]);
 
     // Log accesso
     const ip = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
-    db.run(
+    await db.run(
       'INSERT INTO login_history (user_id, ip_address, user_agent) VALUES (?, ?, ?)',
       [user.id, ip, userAgent]
     );
@@ -279,7 +197,10 @@ app.post('/api/login', authLimiter, [
         azienda: user.azienda
       }
     });
-  });
+  } catch (error) {
+    console.error('Errore login:', error);
+    res.status(500).json({ error: 'Errore server' });
+  }
 });
 
 // Profilo utente (protetto)
@@ -622,12 +543,7 @@ app.listen(PORT, () => {
 });
 
 // Graceful shutdown
-process.on('SIGINT', () => {
-  db.close((err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log('🛑 Database chiuso');
-    process.exit(0);
-  });
+process.on('SIGINT', async () => {
+  await db.close();
+  process.exit(0);
 });
