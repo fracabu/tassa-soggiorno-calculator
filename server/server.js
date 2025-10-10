@@ -156,7 +156,7 @@ app.post('/api/login', authLimiter, [
   const { email, password } = req.body;
 
   try {
-    const user = await db.get('SELECT * FROM users WHERE email = ? AND is_active = 1', [email]);
+    const user = await db.get('SELECT * FROM users WHERE email = ? AND is_active = TRUE', [email]);
 
     if (!user) {
       return res.status(401).json({ error: 'Credenziali non valide' });
@@ -470,7 +470,7 @@ app.put('/api/admin/users/:id', authenticateToken, isAdmin, [
   }
   if (is_active !== undefined) {
     updates.push('is_active = ?');
-    values.push(is_active ? 1 : 0);
+    values.push(is_active);
   }
 
   if (updates.length === 0) {
@@ -511,7 +511,7 @@ app.delete('/api/admin/users/:id', authenticateToken, isAdmin, (req, res) => {
 
 // Statistiche admin
 app.get('/api/admin/stats', authenticateToken, isAdmin, (req, res) => {
-  db.get('SELECT COUNT(*) as total_users FROM users WHERE is_active = 1', (err, row) => {
+  db.get('SELECT COUNT(*) as total_users FROM users WHERE is_active = TRUE', (err, row) => {
     if (err) {
       return res.status(500).json({ error: 'Errore database' });
     }
