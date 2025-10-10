@@ -53,8 +53,6 @@ const AdminPage = ({ darkMode }) => {
       email: user.email,
       nome: user.nome,
       cognome: user.cognome,
-      azienda: user.azienda || '',
-      telefono: user.telefono || '',
       is_active: user.is_active
     });
   };
@@ -101,14 +99,12 @@ const AdminPage = ({ darkMode }) => {
 
   const handleExportCSV = () => {
     // Prepara i dati CSV
-    const headers = ['ID', 'Nome', 'Cognome', 'Email', 'Azienda', 'Telefono', 'Data Registrazione', 'Ultimo Login', 'Stato'];
+    const headers = ['ID', 'Nome', 'Cognome', 'Email', 'Data Registrazione', 'Ultimo Login', 'Stato'];
     const rows = users.map(user => [
       user.id,
       user.nome || '',
       user.cognome || '',
       user.email,
-      user.azienda || '',
-      user.telefono || '',
       new Date(user.created_at).toLocaleDateString('it-IT'),
       user.last_login ? new Date(user.last_login).toLocaleDateString('it-IT') : 'Mai',
       user.is_active ? 'Attivo' : 'Disattivo'
@@ -298,11 +294,6 @@ const AdminPage = ({ darkMode }) => {
                   <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                     darkMode ? 'text-gray-300' : 'text-gray-500'
                   }`}>
-                    Azienda
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                    darkMode ? 'text-gray-300' : 'text-gray-500'
-                  }`}>
                     Registrato
                   </th>
                   <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
@@ -362,19 +353,6 @@ const AdminPage = ({ darkMode }) => {
                             }`}
                           />
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="text"
-                            name="azienda"
-                            value={formData.azienda}
-                            onChange={handleChange}
-                            className={`w-full px-2 py-1 rounded border text-sm ${
-                              darkMode
-                                ? 'bg-gray-700 border-gray-600 text-white'
-                                : 'bg-white border-gray-300 text-gray-900'
-                            }`}
-                          />
-                        </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                           {new Date(user.created_at).toLocaleDateString('it-IT')}
                         </td>
@@ -417,9 +395,6 @@ const AdminPage = ({ darkMode }) => {
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                           {user.email}
-                        </td>
-                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {user.azienda || '-'}
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                           {new Date(user.created_at).toLocaleDateString('it-IT')}
