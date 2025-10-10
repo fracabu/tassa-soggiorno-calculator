@@ -31,8 +31,8 @@ const Header = ({ darkMode, toggleDarkMode, onLogout, onShowGuida }) => {
             />
             <span className={`text-xl sm:text-2xl font-extrabold tracking-tight ${
               darkMode ? 'text-white' : 'text-gray-900'
-            }`} style={{ fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.02em' }}>
-              TourTax
+            }`} style={{ fontFamily: "'Poppins', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.03em', fontWeight: 700 }}>
+              Taxly
             </span>
           </div>
 

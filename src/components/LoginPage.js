@@ -57,13 +57,13 @@ const LoginPage = ({ onLoginSuccess, darkMode }) => {
           <Link to="/" className="inline-flex items-center space-x-2 mb-6 hover:opacity-80 transition-opacity">
             <img
               src="/logo.svg"
-              alt="TourTax Logo"
+              alt="Taxly Logo"
               className="w-12 h-12 rounded-lg"
             />
             <span className={`text-2xl font-extrabold tracking-tight ${
               darkMode ? 'text-white' : 'text-gray-900'
-            }`} style={{ fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.02em' }}>
-              TourTax
+            }`} style={{ fontFamily: "'Poppins', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.03em', fontWeight: 700 }}>
+              Taxly
             </span>
           </Link>
           <h1 className={`text-2xl font-bold ${

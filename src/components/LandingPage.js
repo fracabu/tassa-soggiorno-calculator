@@ -99,13 +99,13 @@ const LandingPage = ({ onRegisterSuccess, darkMode }) => {
             <Link to="/" className="flex items-center space-x-2">
               <img
                 src="/logo.svg"
-                alt="TourTax Logo"
+                alt="Taxly Logo"
                 className="w-10 h-10 rounded-lg"
               />
               <span className={`text-xl sm:text-2xl font-extrabold tracking-tight ${
                 darkMode ? 'text-white' : 'text-gray-900'
-              }`} style={{ fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.02em' }}>
-                TourTax
+              }`} style={{ fontFamily: "'Poppins', 'SF Pro Display', -apple-system, sans-serif", letterSpacing: '-0.03em', fontWeight: 700 }}>
+                Taxly
               </span>
             </Link>
 
