@@ -100,7 +100,7 @@ app.post('/api/register', authLimiter, [
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password, nome, cognome, azienda, telefono } = req.body;
+  const { email, password, nome, cognome } = req.body;
 
   try {
     // Verifica se email esiste già
@@ -115,9 +115,9 @@ app.post('/api/register', authLimiter, [
 
     // Inserisci nuovo utente
     const result = await db.run(
-      `INSERT INTO users (email, password, nome, cognome, azienda, telefono)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [email, hashedPassword, nome, cognome, azienda || null, telefono || null]
+      `INSERT INTO users (email, password, nome, cognome)
+       VALUES (?, ?, ?, ?)`,
+      [email, hashedPassword, nome, cognome]
     );
 
     // Genera JWT
@@ -193,8 +193,7 @@ app.post('/api/login', authLimiter, [
         id: user.id,
         email: user.email,
         nome: user.nome,
-        cognome: user.cognome,
-        azienda: user.azienda
+        cognome: user.cognome
       }
     });
   } catch (error) {
@@ -204,20 +203,22 @@ app.post('/api/login', authLimiter, [
 });
 
 // Profilo utente (protetto)
-app.get('/api/profile', authenticateToken, (req, res) => {
-  db.get(
-    'SELECT id, email, nome, cognome, azienda, telefono, created_at, last_login FROM users WHERE id = ?',
-    [req.user.id],
-    (err, user) => {
-      if (err) {
-        return res.status(500).json({ error: 'Errore database' });
-      }
-      if (!user) {
-        return res.status(404).json({ error: 'Utente non trovato' });
-      }
-      res.json({ user });
+app.get('/api/profile', authenticateToken, async (req, res) => {
+  try {
+    const user = await db.get(
+      'SELECT id, email, nome, cognome, created_at, last_login FROM users WHERE id = ?',
+      [req.user.id]
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: 'Utente non trovato' });
     }
-  );
+
+    res.json({ user });
+  } catch (error) {
+    console.error('Errore profilo:', error);
+    res.status(500).json({ error: 'Errore database' });
+  }
 });
 
 // Forgot Password - richiesta reset
@@ -231,10 +232,8 @@ app.post('/api/forgot-password', authLimiter, [
 
   const { email } = req.body;
 
-  db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
-    if (err) {
-      return res.status(500).json({ error: 'Errore database' });
-    }
+  try {
+    const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
 
     // Non rivelare se l'email esiste (sicurezza)
     if (!user) {
@@ -247,22 +246,20 @@ app.post('/api/forgot-password', authLimiter, [
     const resetTokenExpires = new Date(Date.now() + 3600000); // 1 ora
 
     // Salva token nel DB
-    db.run(
+    await db.run(
       'UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?',
-      [resetTokenHash, resetTokenExpires.toISOString(), user.id],
-      async (err) => {
-        if (err) {
-          return res.status(500).json({ error: 'Errore durante il reset' });
-        }
-
-        // Invia email con link reset
-        const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
-        await sendResetPasswordEmail(user.email, user.nome, resetUrl);
-
-        res.json({ message: 'Se l\'email esiste, riceverai un link per il reset' });
-      }
+      [resetTokenHash, resetTokenExpires.toISOString(), user.id]
     );
-  });
+
+    // Invia email con link reset
+    const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
+    await sendResetPasswordEmail(user.email, user.nome, resetUrl);
+
+    res.json({ message: 'Se l\'email esiste, riceverai un link per il reset' });
+  } catch (error) {
+    console.error('Errore reset password:', error);
+    res.status(500).json({ error: 'Errore durante il reset' });
+  }
 });
 
 // Reset Password - conferma con token
@@ -277,45 +274,40 @@ app.post('/api/reset-password', authLimiter, [
 
   const { token, password } = req.body;
 
-  // Hash del token ricevuto
-  const resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  try {
+    // Hash del token ricevuto
+    const resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
-  db.get(
-    'SELECT * FROM users WHERE reset_token = ? AND reset_token_expires > ?',
-    [resetTokenHash, new Date().toISOString()],
-    async (err, user) => {
-      if (err) {
-        return res.status(500).json({ error: 'Errore database' });
-      }
+    const user = await db.get(
+      'SELECT * FROM users WHERE reset_token = ? AND reset_token_expires > ?',
+      [resetTokenHash, new Date().toISOString()]
+    );
 
-      if (!user) {
-        return res.status(400).json({ error: 'Token non valido o scaduto' });
-      }
-
-      // Hash nuova password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Aggiorna password e rimuovi token
-      db.run(
-        'UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
-        [hashedPassword, user.id],
-        (err) => {
-          if (err) {
-            return res.status(500).json({ error: 'Errore durante il reset' });
-          }
-
-          res.json({ message: 'Password aggiornata con successo' });
-        }
-      );
+    if (!user) {
+      return res.status(400).json({ error: 'Token non valido o scaduto' });
     }
-  );
+
+    // Hash nuova password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Aggiorna password e rimuovi token
+    await db.run(
+      'UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
+      [hashedPassword, user.id]
+    );
+
+    res.json({ message: 'Password aggiornata con successo' });
+  } catch (error) {
+    console.error('Errore reset password:', error);
+    res.status(500).json({ error: 'Errore durante il reset' });
+  }
 });
 
 // Salva calcolo (protetto)
 app.post('/api/calculations', authenticateToken, [
   body('comune').notEmpty(),
   body('data').isObject()
-], (req, res) => {
+], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -323,60 +315,60 @@ app.post('/api/calculations', authenticateToken, [
 
   const { comune, file_name, total_prenotazioni, total_notti, total_tassa, data } = req.body;
 
-  db.run(
-    `INSERT INTO calculations (user_id, comune, file_name, total_prenotazioni, total_notti, total_tassa, data)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [req.user.id, comune, file_name, total_prenotazioni, total_notti, total_tassa, JSON.stringify(data)],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Errore salvataggio calcolo' });
-      }
+  try {
+    const result = await db.run(
+      `INSERT INTO calculations (user_id, comune, file_name, total_prenotazioni, total_notti, total_tassa, data)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [req.user.id, comune, file_name, total_prenotazioni, total_notti, total_tassa, JSON.stringify(data)]
+    );
 
-      res.status(201).json({
-        message: 'Calcolo salvato',
-        calculation_id: this.lastID
-      });
-    }
-  );
+    res.status(201).json({
+      message: 'Calcolo salvato',
+      calculation_id: result.lastID
+    });
+  } catch (error) {
+    console.error('Errore salvataggio calcolo:', error);
+    res.status(500).json({ error: 'Errore salvataggio calcolo' });
+  }
 });
 
 // Recupera calcoli utente (protetto)
-app.get('/api/calculations', authenticateToken, (req, res) => {
+app.get('/api/calculations', authenticateToken, async (req, res) => {
   const { limit = 50, offset = 0 } = req.query;
 
-  db.all(
-    'SELECT id, comune, file_name, total_prenotazioni, total_notti, total_tassa, created_at FROM calculations WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-    [req.user.id, parseInt(limit), parseInt(offset)],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: 'Errore database' });
-      }
+  try {
+    const rows = await db.query(
+      'SELECT id, comune, file_name, total_prenotazioni, total_notti, total_tassa, created_at FROM calculations WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+      [req.user.id, parseInt(limit), parseInt(offset)]
+    );
 
-      res.json({ calculations: rows });
-    }
-  );
+    res.json({ calculations: rows });
+  } catch (error) {
+    console.error('Errore recupero calcoli:', error);
+    res.status(500).json({ error: 'Errore database' });
+  }
 });
 
 // Recupera singolo calcolo con dettagli (protetto)
-app.get('/api/calculations/:id', authenticateToken, (req, res) => {
-  db.get(
-    'SELECT * FROM calculations WHERE id = ? AND user_id = ?',
-    [req.params.id, req.user.id],
-    (err, row) => {
-      if (err) {
-        return res.status(500).json({ error: 'Errore database' });
-      }
+app.get('/api/calculations/:id', authenticateToken, async (req, res) => {
+  try {
+    const row = await db.get(
+      'SELECT * FROM calculations WHERE id = ? AND user_id = ?',
+      [req.params.id, req.user.id]
+    );
 
-      if (!row) {
-        return res.status(404).json({ error: 'Calcolo non trovato' });
-      }
-
-      // Parse JSON data
-      row.data = JSON.parse(row.data);
-
-      res.json({ calculation: row });
+    if (!row) {
+      return res.status(404).json({ error: 'Calcolo non trovato' });
     }
-  );
+
+    // Parse JSON data
+    row.data = JSON.parse(row.data);
+
+    res.json({ calculation: row });
+  } catch (error) {
+    console.error('Errore recupero calcolo:', error);
+    res.status(500).json({ error: 'Errore database' });
+  }
 });
 
 // ==================== ADMIN ROUTES ====================
@@ -411,23 +403,23 @@ const isAdmin = (req, res, next) => {
 };
 
 // Lista tutti gli utenti (protetto admin)
-app.get('/api/admin/users', authenticateToken, isAdmin, (req, res) => {
+app.get('/api/admin/users', authenticateToken, isAdmin, async (req, res) => {
   console.log('📋 Richiesta lista utenti da:', req.user.email);
 
-  db.all(
-    `SELECT id, email, nome, cognome, azienda, telefono, created_at, last_login, is_active
-     FROM users
-     ORDER BY created_at DESC`,
-    [],
-    (err, rows) => {
-      if (err) {
-        console.error('❌ Errore query utenti:', err);
-        return res.status(500).json({ error: 'Errore database' });
-      }
-      console.log(`✅ Trovati ${rows.length} utenti`);
-      res.json({ users: rows });
-    }
-  );
+  try {
+    const rows = await db.query(
+      `SELECT id, email, nome, cognome, created_at, last_login, is_active
+       FROM users
+       ORDER BY created_at DESC`,
+      []
+    );
+
+    console.log(`✅ Trovati ${rows.length} utenti`);
+    res.json({ users: rows });
+  } catch (error) {
+    console.error('❌ Errore query utenti:', error);
+    res.status(500).json({ error: 'Errore database' });
+  }
 });
 
 // Aggiorna utente (protetto admin)
@@ -436,14 +428,14 @@ app.put('/api/admin/users/:id', authenticateToken, isAdmin, [
   body('nome').optional().trim(),
   body('cognome').optional().trim(),
   body('is_active').optional().isBoolean()
-], (req, res) => {
+], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
   const { id } = req.params;
-  const { email, nome, cognome, azienda, telefono, is_active } = req.body;
+  const { email, nome, cognome, is_active } = req.body;
 
   const updates = [];
   const values = [];
@@ -460,14 +452,6 @@ app.put('/api/admin/users/:id', authenticateToken, isAdmin, [
     updates.push('cognome = ?');
     values.push(cognome);
   }
-  if (azienda !== undefined) {
-    updates.push('azienda = ?');
-    values.push(azienda);
-  }
-  if (telefono !== undefined) {
-    updates.push('telefono = ?');
-    values.push(telefono);
-  }
   if (is_active !== undefined) {
     updates.push('is_active = ?');
     values.push(is_active);
@@ -479,55 +463,56 @@ app.put('/api/admin/users/:id', authenticateToken, isAdmin, [
 
   values.push(id);
 
-  db.run(
-    `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
-    values,
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Errore durante l\'aggiornamento' });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Utente non trovato' });
-      }
-      res.json({ message: 'Utente aggiornato con successo' });
+  try {
+    const result = await db.run(
+      `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+      values
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Utente non trovato' });
     }
-  );
+
+    res.json({ message: 'Utente aggiornato con successo' });
+  } catch (error) {
+    console.error('Errore aggiornamento utente:', error);
+    res.status(500).json({ error: 'Errore durante l\'aggiornamento' });
+  }
 });
 
 // Elimina utente (protetto admin)
-app.delete('/api/admin/users/:id', authenticateToken, isAdmin, (req, res) => {
+app.delete('/api/admin/users/:id', authenticateToken, isAdmin, async (req, res) => {
   const { id } = req.params;
 
-  db.run('DELETE FROM users WHERE id = ?', [id], function(err) {
-    if (err) {
-      return res.status(500).json({ error: 'Errore durante l\'eliminazione' });
-    }
-    if (this.changes === 0) {
+  try {
+    const result = await db.run('DELETE FROM users WHERE id = ?', [id]);
+
+    if (result.changes === 0) {
       return res.status(404).json({ error: 'Utente non trovato' });
     }
+
     res.json({ message: 'Utente eliminato con successo' });
-  });
+  } catch (error) {
+    console.error('Errore eliminazione utente:', error);
+    res.status(500).json({ error: 'Errore durante l\'eliminazione' });
+  }
 });
 
 // Statistiche admin
-app.get('/api/admin/stats', authenticateToken, isAdmin, (req, res) => {
-  db.get('SELECT COUNT(*) as total_users FROM users WHERE is_active = TRUE', (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: 'Errore database' });
-    }
+app.get('/api/admin/stats', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const userCount = await db.get('SELECT COUNT(*) as total_users FROM users WHERE is_active = TRUE');
+    const calcCount = await db.get('SELECT COUNT(*) as total_calculations FROM calculations');
 
-    db.get('SELECT COUNT(*) as total_calculations FROM calculations', (err2, row2) => {
-      if (err2) {
-        return res.status(500).json({ error: 'Errore database' });
-      }
-
-      res.json({
-        total_users: row.total_users,
-        total_calculations: row2.total_calculations,
-        timestamp: new Date()
-      });
+    res.json({
+      total_users: userCount.total_users,
+      total_calculations: calcCount.total_calculations,
+      timestamp: new Date()
     });
-  });
+  } catch (error) {
+    console.error('Errore statistiche admin:', error);
+    res.status(500).json({ error: 'Errore database' });
+  }
 });
 
 // Error handling
