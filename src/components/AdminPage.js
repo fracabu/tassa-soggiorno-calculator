@@ -6,7 +6,6 @@ import {
   TrashIcon,
   XMarkIcon,
   CheckCircleIcon,
-  ChartBarIcon,
   ArrowLeftIcon,
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
@@ -212,7 +211,7 @@ const AdminPage = ({ darkMode }) => {
 
         {/* Statistiche */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className={`p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow`}>
               <div className="flex items-center">
                 <UserGroupIcon className="w-8 h-8 text-indigo-600 mr-3" />
@@ -222,20 +221,6 @@ const AdminPage = ({ darkMode }) => {
                   </p>
                   <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                     {stats.total_users}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className={`p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow`}>
-              <div className="flex items-center">
-                <ChartBarIcon className="w-8 h-8 text-green-600 mr-3" />
-                <div>
-                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Calcoli Totali
-                  </p>
-                  <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {stats.total_calculations}
                   </p>
                 </div>
               </div>
